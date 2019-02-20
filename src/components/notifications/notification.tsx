@@ -23,12 +23,13 @@ interface NotificationItemProps {
 export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationItemProps>((
   { notification, onCheck, initialOpen, onFocus },
   ref,
-  ) => {
+) => {
   const github = useContext(GitHubContext);
   const [open, setOpen] = useState(initialOpen);
 
   const [issue, setIssue] = useState<Octokit.IssuesGetResponse | Octokit.PullsGetResponse | null>(null);
   const [comments, setComments] = useState<Comment[] | null>(null);
+  const [isLoading, setLoading] = useState<boolean>(false);
 
   // TODO: Extract to API
   const loadIssue = async () => {
@@ -39,6 +40,7 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
   // TODO: Extract to API
   const loadComments = async () => {
     if (issue) {
+      setLoading(true);
       const comments = await github.loadComments(
         notification.repository.owner.login,
         notification.repository.name,
@@ -46,6 +48,7 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
         notification.last_read_at
       );
       setComments(comments);
+      setLoading(false);
     }
   };
   
@@ -61,6 +64,7 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
       case 'e':
         event.preventDefault();
         event.stopPropagation();
+        setLoading(true);
         onCheck();
         break;
       case 'o':
@@ -92,6 +96,7 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
         onFocus();
       }}
     >
+      { isLoading && <EuiProgress position="absolute" color="subdued" size="xs" /> }
       { issue && 'base' in issue && 
         <EuiIcon type="editorCodeBlock" />
       }
@@ -126,7 +131,6 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
       }
       { open &&
         <div>
-          {!comments && <EuiProgress position="absolute" color="subdued" size="xs" />}
           {comments && 
             <Comments
               comments={comments}
@@ -136,4 +140,4 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
       }
     </div>
   );
-}); 
+});
