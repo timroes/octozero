@@ -129,7 +129,7 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
       }
       { open &&
         <div>
-          {!comments && <EuiProgress position="absolute" color="accent" size="xs" />}
+          {!comments && <EuiProgress position="absolute" color="subdued" size="xs" />}
           {comments && 
             <Comments
               comments={comments}
