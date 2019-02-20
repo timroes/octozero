@@ -1,3 +1,15 @@
+@import "../../styles/mixins";
+
+.comment {
+  border: 1px solid #DDD;
+  border-radius: 2px;
+  background: #FFF;
+}
+
+.comment + .comment {
+  margin-top: 0.5em;
+}
+
 .comment__avatar {
   width: 24px;
   height: 24px;
@@ -8,10 +20,18 @@
 .comment__meta {
   display: flex;
   align-items: center;
-  margin-bottom: 0.5em;
+  padding: 0.5em;
+  background: #f6f8fa;
+  border-bottom: 1px solid #DDD;
 }
 
 .comment__author {
   font-weight: bold;
   margin-right: 0.25em;
+}
+
+.comment__body {
+  padding: 1em;
+
+  @extend %markdownContent;
 }

@@ -19,15 +19,13 @@ export function CommentContent({ body, author, time }: CommentContentProps) {
     <div className={css.comment}>
       <div className={css.comment__meta}>
         <img src={author.avatar_url} className={css.comment__avatar}/>
-        <span className={css.comment__author}>{author.login}</span> wrote {moment(time).fromNow()}
+        <span className={css.comment__author}>{author.login}</span> commented {moment(time).fromNow()}
       </div>
-      <EuiPanel>
-        <EuiText>
-          <ReactMarkdown
-            source={body}
-          />
-        </EuiText>
-      </EuiPanel>
+      <div className={css.comment__body}>
+        <ReactMarkdown
+          source={body}
+        />
+      </div>
     </div>
   );
 }

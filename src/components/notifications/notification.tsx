@@ -1,16 +1,20 @@
 import React, { useState, useContext, useEffect } from 'react';
 import Octokit from '@octokit/rest';
-import { GitHubContext } from '../../contexts/github';
 import {
   EuiBadge,
   EuiButtonEmpty,
   EuiButtonIcon,
   EuiIcon,
   EuiLoadingSpinner,
+  EuiProgress,
 } from '@elastic/eui';
+
+import { GitHubContext } from '../../contexts/github';
+import { Comment } from '../../types';
 import { CommentContent } from '../comments/comment-content';
 
 import css from './notification.module.scss';
+import { Comments } from '../comments';
 
 interface NotificationItemProps {
   notification: Octokit.ActivityListNotificationsForRepoResponseItem;
@@ -27,7 +31,7 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
   const [open, setOpen] = useState(initialOpen);
 
   const [issue, setIssue] = useState<Octokit.IssuesGetResponse | Octokit.PullsGetResponse | null>(null);
-  const [comment, setComment] = useState<Octokit.IssuesGetCommentResponse | null>(null);
+  const [comments, setComments] = useState<Comment[] | null>(null);
 
   // TODO: Extract to API
   const loadIssue = async () => {
@@ -37,8 +41,15 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
 
   // TODO: Extract to API
   const loadComments = async () => {
-    const comment: Octokit.Response<Octokit.IssuesGetCommentResponse> = await github.api.request(notification.subject.latest_comment_url);
-    setComment(comment.data);
+    if (issue) {
+      const comments = await github.loadComments(
+        notification.repository.owner.login,
+        notification.repository.name,
+        issue.number,
+        notification.last_read_at
+      );
+      setComments(comments);
+    }
   };
   
   useEffect(() => {
@@ -118,12 +129,10 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
       }
       { open &&
         <div>
-          {!comment && <EuiLoadingSpinner />}
-          {comment && 
-            <CommentContent
-              author={comment.user}
-              time={comment.updated_at}
-              body={comment.body}
+          {!comments && <EuiProgress position="absolute" color="accent" size="xs" />}
+          {comments && 
+            <Comments
+              comments={comments}
             />
           }
         </div>

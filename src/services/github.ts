@@ -1,6 +1,6 @@
 import Octokit from '@octokit/rest';
 
-import { Notification } from '../types';
+import { Comment, Notification } from '../types';
 
 class GitHubApi {
   private octokit: Octokit;
@@ -20,6 +20,18 @@ class GitHubApi {
   public async markNotificationAsRead(threadId: string): Promise<{}> {
     const response = await this.octokit.activity.markThreadAsRead({ thread_id: Number(threadId) });
     return response.data;
+  }
+
+  public async loadComments(owner: string, repo: string, issue: number, since?: string): Promise<Comment[]> {
+    const params: Octokit.IssuesListCommentsParams = {
+      owner, repo, number: issue,
+    };
+    if (since) {
+      params.since = since;
+    }
+    const comments = await this.octokit.issues.listComments(params);
+
+    return comments.data;
   }
 
   public get api() {
