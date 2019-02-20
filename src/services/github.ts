@@ -18,7 +18,15 @@ class GitHubApi {
 
   public async getUnreadNotifications(): Promise<Notification[]> {
     const notifications = await this.octokit.activity.listNotifications({ per_page: 100 });
-    return notifications.data;
+    // TODO: Better streaming approach
+    const promises = notifications.data.map(async (notification) => {
+      const issue: Octokit.Response<Octokit.IssuesGetResponse> = await this.octokit.request(notification.subject.url);
+      return {
+        ...notification,
+        issue: issue.data,
+      };
+    });
+    return await Promise.all(promises);
   }
 
   public async markNotificationAsRead(threadId: string): Promise<{}> {

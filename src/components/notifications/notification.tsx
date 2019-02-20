@@ -1,5 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
-import Octokit from '@octokit/rest';
+import React, { useState, useContext } from 'react';
 import {
   EuiBadge,
   EuiButtonIcon,
@@ -8,13 +7,13 @@ import {
 } from '@elastic/eui';
 
 import { GitHubContext } from '../../contexts/github';
-import { Comment } from '../../types';
+import { Comment, Notification } from '../../types';
 
 import css from './notification.module.scss';
 import { Comments } from '../comments';
 
 interface NotificationItemProps {
-  notification: Octokit.ActivityListNotificationsForRepoResponseItem;
+  notification: Notification;
   onCheck: () => void;
   onFocus: () => void;
   initialOpen?: boolean;
@@ -27,34 +26,20 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
   const github = useContext(GitHubContext);
   const [open, setOpen] = useState(initialOpen);
 
-  const [issue, setIssue] = useState<Octokit.IssuesGetResponse | Octokit.PullsGetResponse | null>(null);
   const [comments, setComments] = useState<Comment[] | null>(null);
   const [isLoading, setLoading] = useState<boolean>(false);
 
-  // TODO: Extract to API
-  const loadIssue = async () => {
-    const issue: Octokit.Response<Octokit.IssuesGetResponse> = await github.api.request(notification.subject.url);
-    setIssue(issue.data);
-  };
-
-  // TODO: Extract to API
   const loadComments = async () => {
-    if (issue) {
-      setLoading(true);
-      const comments = await github.loadComments(
-        notification.repository.owner.login,
-        notification.repository.name,
-        issue.number,
-        notification.last_read_at
-      );
-      setComments(comments);
-      setLoading(false);
-    }
+    setLoading(true);
+    const comments = await github.loadComments(
+      notification.repository.owner.login,
+      notification.repository.name,
+      notification.issue.number,
+      notification.last_read_at
+    );
+    setComments(comments);
+    setLoading(false);
   };
-  
-  useEffect(() => {
-    loadIssue()
-  }, [true]);
 
   const onKeyDown = (event: React.KeyboardEvent) => {
     switch (event.key) {
@@ -68,9 +53,7 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
         onCheck();
         break;
       case 'o':
-        if (issue) {
-          window.open(issue.html_url);
-        }
+        window.open(notification.issue.html_url);
         break;
       case 'Enter':
       case 'Return':
@@ -97,7 +80,7 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
       }}
     >
       { isLoading && <EuiProgress position="absolute" color="subdued" size="xs" /> }
-      { issue && 'base' in issue && 
+      { 'base' in notification.issue && 
         <EuiIcon type="editorCodeBlock" />
       }
       {notification.subject.title}
@@ -106,29 +89,24 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
       >
         {notification.repository.owner.login}/{notification.repository.name}
       </EuiBadge>
-      { issue &&
-        issue.labels.map(label => (
+      { notification.issue.labels.map(label => (
           <EuiBadge
             key={label.id}
             color={`#${label.color}`}
           >
             {label.name}
           </EuiBadge>
-        ))
-      }
-
+        ))}
       <EuiButtonIcon
         iconType="check"
         aria-label="Done"
         onClick={() => onCheck()}
       />
-      { issue &&
-        <EuiButtonIcon
-          iconType="popout"
-          aria-label="Open on GitHub"
-          onClick={() => window.open(issue.html_url)}
-        />
-      }
+      <EuiButtonIcon
+        iconType="popout"
+        aria-label="Open on GitHub"
+        onClick={() => window.open(notification.issue.html_url)}
+      />
       { open &&
         <div>
           {comments && 
