@@ -30,7 +30,7 @@ class GitHubApi {
       params.since = since;
     }
     const comments = await this.octokit.issues.listComments(params);
-
+    // TODO: load only most recent comment if no comment has been returned
     return comments.data;
   }
 
