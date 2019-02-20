@@ -1,0 +1,17 @@
+.comment__avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  margin-right: 0.3em;
+}
+
+.comment__meta {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5em;
+}
+
+.comment__author {
+  font-weight: bold;
+  margin-right: 0.25em;
+}

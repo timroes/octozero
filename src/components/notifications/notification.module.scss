@@ -1,0 +1,24 @@
+@import "../../styles/variables";
+
+.notification {
+  border-bottom: 1px solid #DDD;
+  position: relative;
+  padding-left: 10px;
+}
+
+.notification:before {
+  content: '';
+  width: 5px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background-color: transparent;
+}
+
+.notification:focus {
+  background-color: #EFEFEF;
+  &:before {
+    background-color: $highlight-color;
+  }
+}

@@ -1,28 +1,26 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.tsx</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+import '@elastic/eui/dist/eui_theme_light.css';
+import css from './App.module.scss';
+
+import { GitHubContext } from './contexts/github';
+import { Sidebar } from './components/navigation/sidebar';
+import { NotificationList } from './components/notifications';
+import { GitHubApi } from './services/github';
+
+const github = new GitHubApi('31c721411ff319b118f25c18380223de055f3432');
+
+function App() {
+  return (
+    <GitHubContext.Provider value={github}>
+      <div className={css.app}>
+        <Sidebar className={css.app__sidebar} />
+        <main className={css.app__main}>
+          <NotificationList />
+        </main>
       </div>
-    );
-  }
+    </GitHubContext.Provider>
+  );
 }
 
 export default App;
