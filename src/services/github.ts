@@ -5,10 +5,14 @@ import { Comment, Notification } from '../types';
 class GitHubApi {
   private octokit: Octokit;
 
-  constructor(apiToken?: string) {
+  constructor(apiToken: string | null) {
     // TODO: Initialization without token
     this.octokit = new Octokit({
       auth: `token ${apiToken}`,
+      // TODO: Deprecated, how can we disable caching now, since it's not workign properly
+      headers: {
+        'if-none-match': '',
+      },
     });
   }
 

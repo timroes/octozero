@@ -19,7 +19,7 @@ export function Comments({ comments }: CommentsProps) {
           time={comment.updated_at}
           body={comment.body}
         />
-      ))}      
+      ))}
     </div>
   );
 }

@@ -8,7 +8,8 @@ import { Sidebar } from './components/navigation/sidebar';
 import { NotificationList } from './components/notifications';
 import { GitHubApi } from './services/github';
 
-const github = new GitHubApi('31c721411ff319b118f25c18380223de055f3432');
+// TODO: A login would be nice
+const github = new GitHubApi(localStorage.getItem('github_token'));
 
 function App() {
   return (

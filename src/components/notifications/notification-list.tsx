@@ -30,6 +30,11 @@ export function NotificationList() {
     loadNots();
   }, [true]);
 
+  useEffect(() => {
+    const intervalId = setInterval(loadNots, 60000);
+    return () => { clearInterval(intervalId); }
+  });
+
   const focusChild = (index: number) => {
     if (index >= 0 && index < itemRefs.length) {
       const toFocus = itemRefs[index].current;
@@ -40,14 +45,22 @@ export function NotificationList() {
   };
 
   const onKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'ArrowDown') {
-      event.preventDefault();
-      event.stopPropagation();
-      focusChild(focused + 1);
-    } else if (event.key === 'ArrowUp') {
-      event.preventDefault();
-      event.stopPropagation();
-      focusChild(focused - 1);
+    switch (event.key) {
+      case 'Down': // IE/Edge Workaround
+      case 'ArrowDown':
+        event.preventDefault();
+        event.stopPropagation();
+        focusChild(focused + 1);
+        break;
+      case 'Up': // IE/Edge workaround
+      case 'ArrowUp':
+        event.preventDefault();
+        event.stopPropagation();
+        focusChild(focused - 1);
+        break;
+      case 'r':
+        loadNots();
+        break;
     }
   };
 

@@ -2,16 +2,13 @@ import React, { useState, useContext, useEffect } from 'react';
 import Octokit from '@octokit/rest';
 import {
   EuiBadge,
-  EuiButtonEmpty,
   EuiButtonIcon,
   EuiIcon,
-  EuiLoadingSpinner,
   EuiProgress,
 } from '@elastic/eui';
 
 import { GitHubContext } from '../../contexts/github';
 import { Comment } from '../../types';
-import { CommentContent } from '../comments/comment-content';
 
 import css from './notification.module.scss';
 import { Comments } from '../comments';
@@ -71,7 +68,12 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
           window.open(issue.html_url);
         }
         break;
-    } 
+      case 'Enter':
+      case 'Return':
+        setOpen(true);
+        loadComments();
+        break;
+    }
   };
 
   return (
@@ -82,23 +84,18 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
       tabIndex={0}
       aria-label={notification.subject.title}
       onKeyDown={onKeyDown}
-      onFocus={() => {
+      onClick={() => {
         setOpen(true);
         loadComments();
+      }}
+      onFocus={() => {
         onFocus();
       }}
     >
       { issue && 'base' in issue && 
         <EuiIcon type="editorCodeBlock" />
       }
-      <EuiButtonEmpty
-        onClick={() => {
-          setOpen(!open);
-          loadComments();
-        }}
-      >
-        {notification.subject.title}
-      </EuiButtonEmpty>
+      {notification.subject.title}
       <EuiBadge
         color="hollow"
       >

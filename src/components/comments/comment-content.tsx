@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { EuiPanel, EuiText } from '@elastic/eui';
 import moment from 'moment';
+
+import { replaceEmojis } from '../../utils/emojis';
 
 import css from './comment.module.scss';
 
@@ -15,6 +16,8 @@ interface CommentContentProps {
 }
 
 export function CommentContent({ body, author, time }: CommentContentProps) {
+  const markdown = replaceEmojis(body);
+
   return (
     <div className={css.comment}>
       <div className={css.comment__meta}>
@@ -23,7 +26,7 @@ export function CommentContent({ body, author, time }: CommentContentProps) {
       </div>
       <div className={css.comment__body}>
         <ReactMarkdown
-          source={body}
+          source={markdown}
         />
       </div>
     </div>

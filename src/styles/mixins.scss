@@ -2,14 +2,29 @@
   line-height: 1.5;
   font-size: 14px;
 
-  p:not(:last-child) {
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.25;
+    margin-bottom: 16px;
+  }
+
+  h1, h2 {
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid #eaecef;
+  }
+
+  h2 {
+    font-size: 1.5em;
+  }
+
+  p:not(:last-child),
+  ul:not(:last-child) {
     margin-bottom: 0.7em;
   }
 
   ul {
-    margin-bottom: 0.7em;
     list-style: disc;
-    padding-left: 1em;
+    padding-left: 2em;
   }
 
   li {
@@ -23,6 +38,7 @@
     margin-bottom: 0.7em;
   }
 
+  // TODO: Proper pre styling
   code {
     background-color: rgba(27,31,35,.05);
     border-radius: 3px;
