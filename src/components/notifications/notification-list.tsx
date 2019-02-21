@@ -10,7 +10,7 @@ export function NotificationList() {
 
   const itemRefs: Array<React.RefObject<HTMLDivElement>> = [];
   // tslint:disable-next-line prefer-for-of
-  for (let i = 0; i< notifications.length; i++) {
+  for (let i = 0; i < notifications.length; i++) {
     itemRefs.push(React.createRef());
   }
 
@@ -31,7 +31,9 @@ export function NotificationList() {
 
   useEffect(() => {
     const intervalId = setInterval(loadNots, 60000);
-    return () => { clearInterval(intervalId); }
+    return () => {
+      clearInterval(intervalId);
+    };
   });
 
   const focusChild = (index: number) => {
@@ -64,22 +66,17 @@ export function NotificationList() {
   };
 
   return (
-    <div
-      tabIndex={0}
-      onKeyDown={onKeyDown}
-    >
-      {
-         notifications.map((notification, index) => 
-          <NotificationItem
-            key={notification.id}
-            ref={itemRefs[index]}
-            notification={notification}
-            initialOpen={false}
-            onFocus={() => setFocused(index)}
-            onCheck={() => checkNotification(notification)}
-          />
-        )
-      }
-      </div>
-    );
+    <div tabIndex={0} onKeyDown={onKeyDown}>
+      {notifications.map((notification, index) => (
+        <NotificationItem
+          key={notification.id}
+          ref={itemRefs[index]}
+          notification={notification}
+          initialOpen={false}
+          onFocus={() => setFocused(index)}
+          onCheck={() => checkNotification(notification)}
+        />
+      ))}
+    </div>
+  );
 }

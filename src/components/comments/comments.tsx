@@ -1,12 +1,10 @@
 import React from 'react';
-
 import { Comment } from '../../types';
 import { CommentContent } from './comment-content';
-
 import css from './comments.module.scss';
 
 interface CommentsProps {
-  comments: Comment[]
+  comments: Comment[];
 }
 
 export function Comments({ comments }: CommentsProps) {

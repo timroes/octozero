@@ -793,6 +793,13 @@
     tabbable "^1.1.0"
     uuid "^3.1.0"
 
+"@githubprimer/octicons-react@^8.4.2":
+  version "8.4.2"
+  resolved "https://registry.yarnpkg.com/@githubprimer/octicons-react/-/octicons-react-8.4.2.tgz#9f4be408456da895298d3831c9e7b5764ea3a58e"
+  integrity sha512-XVFkZ2Xf+Y8zgz+g5zuVnrzOsDrwKjBrU77IKNyDAXjZ8dhphE01uL9yqRWq29Sa/gchuR1Q5nrHo0Vr9Hnxqg==
+  dependencies:
+    prop-types "^15.6.1"
+
 "@icons/material@^0.2.4":
   version "0.2.4"
   resolved "https://registry.yarnpkg.com/@icons/material/-/material-0.2.4.tgz#e90c9f71768b3736e76d7dd6783fc6c2afa88bc8"
@@ -8295,6 +8302,11 @@ preserve@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/preserve/-/preserve-0.2.0.tgz#815ed1f6ebc65926f865b310c0713bcb3315ce4b"
   integrity sha1-gV7R9uvGWSb4ZbMQwHE7yzMVzks=
+
+prettier@^1.16.4:
+  version "1.16.4"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.16.4.tgz#73e37e73e018ad2db9c76742e2647e21790c9717"
+  integrity sha512-ZzWuos7TI5CKUeQAtFd6Zhm2s6EpAD/ZLApIhsF9pRvRtM1RFo61dM/4MSRUA0SuLugA/zgrZD8m0BaY46Og7g==
 
 pretty-bytes@^4.0.2:
   version "4.0.2"

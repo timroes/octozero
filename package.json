@@ -5,6 +5,7 @@
   "dependencies": {
     "@elastic/datemath": "^5.0.2",
     "@elastic/eui": "^7.1.0",
+    "@githubprimer/octicons-react": "^8.4.2",
     "@octokit/rest": "^16.15.0",
     "@types/jest": "24.0.6",
     "@types/node": "11.9.4",
@@ -35,6 +36,7 @@
     "not op_mini all"
   ],
   "devDependencies": {
+    "prettier": "^1.16.4",
     "tslint": "^5.12.1",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.0.1",

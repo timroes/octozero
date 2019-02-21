@@ -1,7 +1,6 @@
 import Octokit from '@octokit/rest';
 import { Comment, Issue, Notification } from '../types';
 
-
 class GitHubApi {
   private octokit: Octokit;
 
@@ -30,9 +29,16 @@ class GitHubApi {
     return response.data;
   }
 
-  public async loadComments(owner: string, repo: string, issue: number, since?: string): Promise<Comment[]> {
+  public async loadComments(
+    owner: string,
+    repo: string,
+    issue: number,
+    since?: string
+  ): Promise<Comment[]> {
     const params: Octokit.IssuesListCommentsParams = {
-      number: issue, owner, repo
+      number: issue,
+      owner,
+      repo,
     };
     if (since) {
       params.since = since;
@@ -48,4 +54,3 @@ class GitHubApi {
 }
 
 export { GitHubApi };
-

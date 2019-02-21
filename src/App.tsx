@@ -1,11 +1,9 @@
-import React from 'react';
-
 import '@elastic/eui/dist/eui_theme_light.css';
+import React from 'react';
 import css from './App.module.scss';
-
-import { GitHubContext } from './contexts/github';
 import { Sidebar } from './components/navigation/sidebar';
 import { NotificationList } from './components/notifications';
+import { GitHubContext } from './contexts/github';
 import { GitHubApi } from './services/github';
 
 // TODO: A login would be nice
