@@ -21,13 +21,16 @@ export function NotificationList() {
   const checkNotification = async (notification: Notification) => {
     await github.markNotificationAsRead(notification.id);
     await loadNots();
-    focusChild(focused);
   };
 
   // TODO: How to handle loading and caching properly
   useEffect(() => {
     loadNots();
   }, [true]);
+
+  useEffect(() => {
+    focusChild(focused);
+  });
 
   useEffect(() => {
     const intervalId = setInterval(loadNots, 60000);
