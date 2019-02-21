@@ -1,8 +1,9 @@
-import { EuiBadge, EuiButtonIcon, EuiIcon, EuiProgress } from '@elastic/eui';
+import { EuiBadge, EuiButtonIcon, EuiProgress } from '@elastic/eui';
 import React, { useContext, useEffect, useState } from 'react';
 import { GitHubContext } from '../../contexts/github';
 import { Comment, Issue, Notification } from '../../types';
 import { Comments } from '../comments';
+import { NotificationIcon } from './notification-icon';
 import css from './notification.module.scss';
 
 interface NotificationItemProps {
@@ -76,7 +77,10 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
         }}
       >
         {isLoading && <EuiProgress position="absolute" color="subdued" size="xs" />}
-        {'base' in issue && <EuiIcon type="editorCodeBlock" />}
+        <NotificationIcon
+          type={'base' in issue ? 'pr' : 'issue'}
+          state={'merged' in issue && issue.merged ? 'merged' : issue.state}
+        />
         {notification.subject.title}
         <EuiBadge color="hollow">
           {notification.repository.owner.login}/{notification.repository.name}
