@@ -1,7 +1,6 @@
-import React, { useContext, useState, useEffect } from 'react';
-
-import { Notification } from '../../types';
+import React, { useContext, useEffect, useState } from 'react';
 import { GitHubContext } from '../../contexts/github';
+import { Notification } from '../../types';
 import { NotificationItem } from './notification';
 
 export function NotificationList() {
@@ -10,13 +9,13 @@ export function NotificationList() {
   const [focused, setFocused] = useState<number>(-1);
 
   const itemRefs: Array<React.RefObject<HTMLDivElement>> = [];
+  // tslint:disable-next-line prefer-for-of
   for (let i = 0; i< notifications.length; i++) {
     itemRefs.push(React.createRef());
   }
 
   const loadNots = async () => {
-    const notifications = await github.getUnreadNotifications();
-    setNotifications(notifications);
+    setNotifications(await github.getUnreadNotifications());
   };
 
   const checkNotification = async (notification: Notification) => {

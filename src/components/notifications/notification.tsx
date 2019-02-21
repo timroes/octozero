@@ -1,16 +1,9 @@
-import React, { useState, useContext } from 'react';
-import {
-  EuiBadge,
-  EuiButtonIcon,
-  EuiIcon,
-  EuiProgress,
-} from '@elastic/eui';
-
+import { EuiBadge, EuiButtonIcon, EuiIcon, EuiProgress } from '@elastic/eui';
+import React, { useContext, useEffect, useState } from 'react';
 import { GitHubContext } from '../../contexts/github';
-import { Comment, Notification } from '../../types';
-
-import css from './notification.module.scss';
+import { Comment, Issue, Notification } from '../../types';
 import { Comments } from '../comments';
+import css from './notification.module.scss';
 
 interface NotificationItemProps {
   notification: Notification;
@@ -19,8 +12,12 @@ interface NotificationItemProps {
   initialOpen?: boolean;
 }
 
-export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationItemProps>((
-  { notification, onCheck, initialOpen, onFocus },
+interface NotificationItemComponentProps extends NotificationItemProps {
+  issue: Issue;
+}
+
+const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationItemComponentProps>((
+  { notification, issue, onCheck, initialOpen, onFocus },
   ref,
 ) => {
   const github = useContext(GitHubContext);
@@ -31,13 +28,12 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
 
   const loadComments = async () => {
     setLoading(true);
-    const comments = await github.loadComments(
+    setComments(await github.loadComments(
       notification.repository.owner.login,
       notification.repository.name,
-      notification.issue.number,
+      issue.number,
       notification.last_read_at
-    );
-    setComments(comments);
+    ));
     setLoading(false);
   };
 
@@ -53,7 +49,7 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
         onCheck();
         break;
       case 'o':
-        window.open(notification.issue.html_url);
+        window.open(issue.html_url);
         break;
       case 'Enter':
       case 'Return':
@@ -80,7 +76,7 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
       }}
     >
       { isLoading && <EuiProgress position="absolute" color="subdued" size="xs" /> }
-      { 'base' in notification.issue && 
+      { 'base' in issue && 
         <EuiIcon type="editorCodeBlock" />
       }
       {notification.subject.title}
@@ -89,7 +85,7 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
       >
         {notification.repository.owner.login}/{notification.repository.name}
       </EuiBadge>
-      { notification.issue.labels.map(label => (
+      { issue.labels.map(label => (
           <EuiBadge
             key={label.id}
             color={`#${label.color}`}
@@ -105,7 +101,7 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
       <EuiButtonIcon
         iconType="popout"
         aria-label="Open on GitHub"
-        onClick={() => window.open(notification.issue.html_url)}
+        onClick={() => window.open(issue.html_url)}
       />
       { open &&
         <div>
@@ -117,5 +113,26 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
         </div>
       }
     </div>
+  );
+});
+
+export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationItemProps>((props, ref) => {
+  const github = useContext(GitHubContext);
+  const [issue, setIssue] = useState<Issue | null>(null);
+
+  useEffect(() => {
+    github.getIssueForNotification(props.notification).then(setIssue);
+  }, [props.notification.id]);
+
+  if (!issue) {
+    return null;
+  }
+
+  return (
+    <NotificationItemComponent
+      ref={ref}
+      issue={issue}
+      {...props}
+    />
   );
 });

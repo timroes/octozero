@@ -1,6 +1,6 @@
 import Octokit from '@octokit/rest';
+import { Comment, Issue, Notification } from '../types';
 
-import { Comment, Notification } from '../types';
 
 class GitHubApi {
   private octokit: Octokit;
@@ -18,15 +18,11 @@ class GitHubApi {
 
   public async getUnreadNotifications(): Promise<Notification[]> {
     const notifications = await this.octokit.activity.listNotifications({ per_page: 100 });
-    // TODO: Better streaming approach
-    const promises = notifications.data.map(async (notification) => {
-      const issue: Octokit.Response<Octokit.IssuesGetResponse> = await this.octokit.request(notification.subject.url);
-      return {
-        ...notification,
-        issue: issue.data,
-      };
-    });
-    return await Promise.all(promises);
+    return notifications.data;
+  }
+
+  public async getIssueForNotification(notification: Notification): Promise<Issue> {
+    return (await this.octokit.request(notification.subject.url)).data;
   }
 
   public async markNotificationAsRead(threadId: string): Promise<{}> {
@@ -36,7 +32,7 @@ class GitHubApi {
 
   public async loadComments(owner: string, repo: string, issue: number, since?: string): Promise<Comment[]> {
     const params: Octokit.IssuesListCommentsParams = {
-      owner, repo, number: issue,
+      number: issue, owner, repo
     };
     if (since) {
       params.since = since;
@@ -52,3 +48,4 @@ class GitHubApi {
 }
 
 export { GitHubApi };
+
