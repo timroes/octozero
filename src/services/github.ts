@@ -1,4 +1,5 @@
 import Octokit from '@octokit/rest';
+import React from 'react';
 import { Comment, Issue, Notification } from '../types';
 
 class GitHubApi {
@@ -53,4 +54,6 @@ class GitHubApi {
   }
 }
 
-export { GitHubApi };
+const GitHubContext = React.createContext<GitHubApi>(new GitHubApi(null));
+
+export { GitHubApi, GitHubContext };

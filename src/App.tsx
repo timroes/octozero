@@ -3,7 +3,7 @@ import React from 'react';
 import css from './App.module.scss';
 import { Sidebar } from './components/navigation/sidebar';
 import { NotificationList } from './components/notifications';
-import { GitHubContext } from './contexts/github';
+import { GitHubContext } from './services/github';
 import { GitHubApi } from './services/github';
 
 // TODO: A login would be nice

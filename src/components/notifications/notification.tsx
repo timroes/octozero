@@ -1,6 +1,6 @@
 import { EuiBadge, EuiButtonIcon, EuiProgress } from '@elastic/eui';
 import React, { useContext, useEffect, useState } from 'react';
-import { GitHubContext } from '../../contexts/github';
+import { GitHubContext } from '../../services/github';
 import { Comment, Issue, Notification } from '../../types';
 import { Comments } from '../comments';
 import { NotificationIcon } from './notification-icon';

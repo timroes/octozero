@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { GitHubContext } from '../../contexts/github';
+import { GitHubContext } from '../../services/github';
 import { Notification } from '../../types';
 import { NotificationItem } from './notification';
 
