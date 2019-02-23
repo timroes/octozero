@@ -1,8 +1,8 @@
 import { EuiBadge, EuiButtonIcon, EuiProgress } from '@elastic/eui';
 import React, { useContext, useEffect, useState } from 'react';
 import { GitHubContext } from '../../services/github';
-import { Comment, Issue, Notification } from '../../types';
-import { Comments } from '../comments';
+import { Comment, Event, Issue, Notification } from '../../types';
+import { Changes } from '../changes';
 import { NotificationIcon } from './notification-icon';
 import css from './notification.module.scss';
 
@@ -22,13 +22,13 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
     const github = useContext(GitHubContext);
     const [open, setOpen] = useState(initialOpen);
 
-    const [comments, setComments] = useState<Comment[] | null>(null);
+    const [changes, setChanges] = useState<Array<Comment | Event> | null>(null);
     const [isLoading, setLoading] = useState<boolean>(false);
 
     const loadComments = async () => {
       setLoading(true);
-      setComments(
-        await github.loadComments(
+      setChanges(
+        await github.loadIssueChanges(
           notification.repository.owner.login,
           notification.repository.name,
           issue.number,
@@ -105,7 +105,7 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
             onClick={() => window.open(issue.html_url)}
           />
         </div>
-        {open && <div>{comments && <Comments comments={comments} />}</div>}
+        {open && <div>{changes && <Changes changes={changes} />}</div>}
       </div>
     );
   }

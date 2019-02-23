@@ -1,6 +1,8 @@
 import Octokit from '@octokit/rest';
+import moment from 'moment';
 import React from 'react';
-import { Comment, Issue, Notification } from '../types';
+
+import { Comment, Event, Issue, Notification } from '../types';
 
 class GitHubApi {
   private octokit: Octokit;
@@ -30,23 +32,46 @@ class GitHubApi {
     return response.data;
   }
 
-  public async loadComments(
+  public async loadIssueChanges(
     owner: string,
     repo: string,
     issue: number,
     since?: string
-  ): Promise<Comment[]> {
+  ): Promise<Array<Comment | Event>> {
     const params: Octokit.IssuesListCommentsParams = {
       number: issue,
       owner,
+      per_page: 100,
       repo,
     };
     if (since) {
       params.since = since;
     }
-    const comments = await this.octokit.issues.listComments(params);
-    // TODO: load only most recent comment if no comment has been returned
-    return comments.data;
+    const [comments, events] = await Promise.all([
+      this.octokit.issues.listComments(params),
+      this.octokit.issues.listEvents(params),
+    ]);
+
+    // TODO: Mix together comments and events
+    const filteredEvents = since
+      ? events.data.filter(event => moment(event.created_at).isSameOrAfter(since))
+      : events.data;
+
+    const changes = [...comments.data, ...filteredEvents];
+
+    changes.sort((a, b) => {
+      const utcA = moment(a.created_at).utc();
+      const utcB = moment(b.created_at).utc();
+      if (utcA > utcB) {
+        return 1;
+      } else if (utcB > utcA) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
+
+    return changes;
   }
 
   public get api() {

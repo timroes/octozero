@@ -1,0 +1,31 @@
+.event {
+  display: flex;
+  align-items: center;
+  margin: 0.7em 0.5em;
+}
+
+.event__icon {
+  background: #dde1e6;
+  color: #586069;
+  border-radius: 50%;
+  height: 28px;
+  width: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 0.3em;
+}
+
+.event__icon--red {
+  background: #cb2431;
+  color: #FFF;
+}
+
+.event__icon--green {
+  background: #2cbe4e;
+  color: #FFF;
+}
+
+.event__label {
+  margin: 0 0.3em;
+}
