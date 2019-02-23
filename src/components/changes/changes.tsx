@@ -15,6 +15,7 @@ interface ChangesProps {
 export function Changes({ changes }: ChangesProps) {
   return (
     <div className={css.changes}>
+      {!changes.length && <em>No changes found</em>}
       {changes.map(change =>
         isEvent(change) ? (
           <EventComponent key={change.node_id} event={change} />

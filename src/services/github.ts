@@ -52,7 +52,6 @@ class GitHubApi {
       this.octokit.issues.listEvents(params),
     ]);
 
-    // TODO: Mix together comments and events
     const filteredEvents = since
       ? events.data.filter(event => moment(event.created_at).isSameOrAfter(since))
       : events.data;
@@ -72,10 +71,6 @@ class GitHubApi {
     });
 
     return changes;
-  }
-
-  public get api() {
-    return this.octokit;
   }
 }
 
