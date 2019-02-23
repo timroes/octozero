@@ -93,7 +93,7 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
           <span className={css.notification__repo}>
             <img
               src={notification.repository.owner.avatar_url}
-              aria-hiden="true"
+              aria-hidden="true"
               className={css.notification__repoIcon}
             />
             {notification.repository.owner.login}/{notification.repository.name}
