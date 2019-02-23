@@ -76,26 +76,35 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
           onFocus();
         }}
       >
-        {isLoading && <EuiProgress position="absolute" color="subdued" size="xs" />}
-        <NotificationIcon
-          type={'base' in issue ? 'pr' : 'issue'}
-          state={'merged' in issue && issue.merged ? 'merged' : issue.state}
-        />
-        {notification.subject.title}
-        <EuiBadge color="hollow">
-          {notification.repository.owner.login}/{notification.repository.name}
-        </EuiBadge>
-        {issue.labels.map(label => (
-          <EuiBadge key={label.id} color={`#${label.color}`}>
-            {label.name}
-          </EuiBadge>
-        ))}
-        <EuiButtonIcon iconType="check" aria-label="Done" onClick={() => onCheck()} />
-        <EuiButtonIcon
-          iconType="popout"
-          aria-label="Open on GitHub"
-          onClick={() => window.open(issue.html_url)}
-        />
+        <div className={css.notification__header}>
+          {isLoading && <EuiProgress position="absolute" color="subdued" size="xs" />}
+          <NotificationIcon
+            type={'base' in issue ? 'pr' : 'issue'}
+            state={'merged' in issue && issue.merged ? 'merged' : issue.state}
+          />
+          <span className={css.notification__description}>
+            <h2 className={css.notification__title}>{notification.subject.title}</h2>
+            {issue.labels.map(label => (
+              <EuiBadge key={label.id} color={`#${label.color}`}>
+                {label.name}
+              </EuiBadge>
+            ))}
+          </span>
+          <span className={css.notification__repo}>
+            <img
+              src={notification.repository.owner.avatar_url}
+              aria-hiden="true"
+              className={css.notification__repoIcon}
+            />
+            {notification.repository.owner.login}/{notification.repository.name}
+          </span>
+          <EuiButtonIcon iconType="check" aria-label="Done" onClick={() => onCheck()} />
+          <EuiButtonIcon
+            iconType="popout"
+            aria-label="Open on GitHub"
+            onClick={() => window.open(issue.html_url)}
+          />
+        </div>
         {open && <div>{comments && <Comments comments={comments} />}</div>}
       </div>
     );

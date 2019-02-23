@@ -4,7 +4,8 @@
   border-bottom: 1px solid #DDD;
   position: relative;
   padding-left: 10px;
-  line-height: 2.5;
+  padding: 0.4em 10px;
+  line-height: 1.5;
 }
 
 .notification:before {
@@ -22,4 +23,32 @@
   &:before {
     background-color: $highlight-color;
   }
+}
+
+.notification__header {
+  display: flex;
+  align-items: center;
+}
+
+.notification__description {
+  flex: 1 1 auto;
+}
+
+.notification__title {
+  font-size: 1em;
+  font-weight: 400;
+  display: inline-block;
+  margin-right: 0.4em;
+}
+
+.notification__repo {
+  flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+  opacity: 0.6;
+}
+
+.notification__repoIcon {
+  width: 1em;
+  margin-right: 0.2em;
 }
