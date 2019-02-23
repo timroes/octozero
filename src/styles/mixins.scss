@@ -17,8 +17,9 @@
     font-size: 1.5em;
   }
 
-  p:not(:last-child),
-  ul:not(:last-child) {
+  > p:not(:last-child),
+  > ul:not(:last-child),
+  > pre:not(:last-child) {
     margin-bottom: 0.7em;
   }
 
@@ -38,9 +39,16 @@
     margin-bottom: 0.7em;
   }
 
-  // TODO: Proper pre styling
+  pre {
+    overflow-x: auto;
+    padding: 0.4em;
+    background-color: #F3F3F3;
+  }
+  pre code {
+    background-color: transparent;
+  }
   code {
-    background-color: rgba(27,31,35,.05);
+    background-color: #F3F3F3;
     border-radius: 3px;
     font-size: 85%;
     margin: 0;

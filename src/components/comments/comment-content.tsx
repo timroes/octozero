@@ -1,3 +1,5 @@
+// @ts-ignore
+import { EuiImage } from '@elastic/eui';
 import moment from 'moment';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -15,6 +17,10 @@ interface CommentContentProps {
   time: string;
 }
 
+function ImageComponent({ src, ...rest }: any) {
+  return <EuiImage url={src} size="fullWidth" allowFullScreen={true} {...rest} />;
+}
+
 export function CommentContent({ body, author, time }: CommentContentProps) {
   const markdown = replaceEmojis(body);
 
@@ -26,7 +32,12 @@ export function CommentContent({ body, author, time }: CommentContentProps) {
         {moment(time).fromNow()}
       </div>
       <div className={css.comment__body}>
-        <ReactMarkdown source={markdown} />
+        <ReactMarkdown
+          source={markdown}
+          renderers={{
+            image: ImageComponent,
+          }}
+        />
       </div>
     </div>
   );
