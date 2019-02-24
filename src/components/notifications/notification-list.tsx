@@ -1,3 +1,4 @@
+import { EuiLoadingSpinner } from '@elastic/eui';
 import React, { useContext, useEffect, useState } from 'react';
 import { GitHubContext } from '../../services/github';
 import { Notification } from '../../types';
@@ -7,6 +8,7 @@ export function NotificationList() {
   const github = useContext(GitHubContext);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [focused, setFocused] = useState<number>(-1);
+  const [isLoading, setLoading] = useState(true);
 
   const itemRefs: Array<React.RefObject<HTMLDivElement>> = [];
   // tslint:disable-next-line prefer-for-of
@@ -16,6 +18,7 @@ export function NotificationList() {
 
   const loadNots = async () => {
     setNotifications(await github.getUnreadNotifications());
+    setLoading(false);
   };
 
   const checkNotification = async (notification: Notification) => {
@@ -23,10 +26,9 @@ export function NotificationList() {
     await loadNots();
   };
 
-  // TODO: How to handle loading and caching properly
   useEffect(() => {
     loadNots();
-  }, [true]);
+  }, []);
 
   useEffect(() => {
     focusChild(focused);
@@ -70,6 +72,7 @@ export function NotificationList() {
 
   return (
     <div tabIndex={0} onKeyDown={onKeyDown}>
+      {isLoading && <EuiLoadingSpinner size="xl" />}
       {notifications.map((notification, index) => (
         <NotificationItem
           key={notification.id}
