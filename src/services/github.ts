@@ -1,20 +1,32 @@
 import Octokit from '@octokit/rest';
 import moment from 'moment';
 import React from 'react';
+import { getLogin, loginToken$ } from './login';
 
 import { Comment, Event, Issue, Notification } from '../types';
+
+const OCTOKIT_OPTIONS = {
+  // TODO: Deprecated, how can we disable caching now, since it's not workign properly
+  headers: {
+    'if-none-match': '',
+  },
+};
 
 class GitHubApi {
   private octokit: Octokit;
 
-  constructor(apiToken: string | null) {
+  constructor() {
     // TODO: Initialization without token
     this.octokit = new Octokit({
-      auth: `token ${apiToken}`,
-      // TODO: Deprecated, how can we disable caching now, since it's not workign properly
-      headers: {
-        'if-none-match': '',
-      },
+      auth: `token ${getLogin() || ''}`,
+      ...OCTOKIT_OPTIONS,
+    });
+
+    loginToken$.subscribe(token => {
+      this.octokit = new Octokit({
+        auth: `token ${token || ''}`,
+        ...OCTOKIT_OPTIONS,
+      });
     });
   }
 
@@ -74,6 +86,6 @@ class GitHubApi {
   }
 }
 
-const GitHubContext = React.createContext<GitHubApi>(new GitHubApi(null));
+const GitHubContext = React.createContext<GitHubApi>(new GitHubApi());
 
 export { GitHubApi, GitHubContext };

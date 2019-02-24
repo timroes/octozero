@@ -1,24 +1,19 @@
 import '@elastic/eui/dist/eui_theme_light.css';
 import React from 'react';
-import css from './App.module.scss';
-import { Sidebar } from './components/navigation/sidebar';
-import { NotificationList } from './components/notifications';
-import { GitHubContext } from './services/github';
-import { GitHubApi } from './services/github';
-
-// TODO: A login would be nice
-const github = new GitHubApi(localStorage.getItem('github_token'));
+import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
+import { Dashboard } from './components/dashboard';
+import { Login } from './components/login';
+import { useLogin } from './services/login';
 
 function App() {
+  const loginToken = useLogin();
   return (
-    <GitHubContext.Provider value={github}>
-      <div className={css.app}>
-        <Sidebar className={css.app__sidebar} />
-        <main className={css.app__main}>
-          <NotificationList />
-        </main>
-      </div>
-    </GitHubContext.Provider>
+    <Router>
+      <Switch>
+        <Route path="/login" render={() => (loginToken ? <Redirect to="/inbox" /> : <Login />)} />
+        <Route render={() => (loginToken ? <Dashboard /> : <Redirect to="/login" />)} />
+      </Switch>
+    </Router>
   );
 }
 
