@@ -1,9 +1,9 @@
 import Octokit from '@octokit/rest';
 import moment from 'moment';
-import React from 'react';
+import React, { useContext } from 'react';
 import { getLogin, loginToken$ } from './login';
 
-import { Comment, Event, Issue, Notification } from '../types';
+import { Comment, Event, Issue, Notification, User } from '../types';
 
 const OCTOKIT_OPTIONS = {
   // TODO: Deprecated, how can we disable caching now, since it's not workign properly
@@ -28,6 +28,11 @@ class GitHubApi {
         ...OCTOKIT_OPTIONS,
       });
     });
+  }
+
+  public async getUser(): Promise<User> {
+    const user = await this.octokit.users.getAuthenticated();
+    return user.data;
   }
 
   public async getUnreadNotifications(): Promise<Notification[]> {
@@ -88,4 +93,8 @@ class GitHubApi {
 
 const GitHubContext = React.createContext<GitHubApi>(new GitHubApi());
 
-export { GitHubApi, GitHubContext };
+function useGitHub() {
+  return useContext(GitHubContext);
+}
+
+export { GitHubApi, GitHubContext, useGitHub };

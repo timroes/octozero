@@ -1,6 +1,6 @@
 import { EuiBadge, EuiButtonIcon, EuiProgress } from '@elastic/eui';
-import React, { useContext, useEffect, useState } from 'react';
-import { GitHubContext } from '../../services/github';
+import React, { useEffect, useState } from 'react';
+import { useGitHub } from '../../services/github';
 import { Comment, Event, Issue, Notification } from '../../types';
 import { Changes } from '../changes';
 import { NotificationIcon } from './notification-icon';
@@ -19,7 +19,7 @@ interface NotificationItemComponentProps extends NotificationItemProps {
 
 const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationItemComponentProps>(
   ({ notification, issue, onCheck, initialOpen, onFocus }, ref) => {
-    const github = useContext(GitHubContext);
+    const github = useGitHub();
     const [open, setOpen] = useState(initialOpen);
 
     const [changes, setChanges] = useState<Array<Comment | Event> | null>(null);
@@ -113,7 +113,7 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
 
 export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationItemProps>(
   (props, ref) => {
-    const github = useContext(GitHubContext);
+    const github = useGitHub();
     const [issue, setIssue] = useState<Issue | null>(null);
 
     useEffect(() => {

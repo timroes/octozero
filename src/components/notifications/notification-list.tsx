@@ -1,11 +1,11 @@
 import { EuiLoadingSpinner } from '@elastic/eui';
-import React, { useContext, useEffect, useState } from 'react';
-import { GitHubContext } from '../../services/github';
+import React, { useEffect, useState } from 'react';
+import { useGitHub } from '../../services/github';
 import { Notification } from '../../types';
 import { NotificationItem } from './notification';
 
 export function NotificationList() {
-  const github = useContext(GitHubContext);
+  const github = useGitHub();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [focused, setFocused] = useState<number>(-1);
   const [isLoading, setLoading] = useState(true);
