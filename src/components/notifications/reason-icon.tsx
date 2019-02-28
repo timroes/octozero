@@ -9,6 +9,7 @@ import Octoicon, {
   Organization,
   Pencil,
   Person,
+  Pin,
   PrimitiveDot,
   Repo,
   Unmute,
@@ -18,7 +19,7 @@ import React from 'react';
 import css from './reason-icon.module.scss';
 
 const REASON_ICONS: { [reason: string]: Icon } = {
-  assign: Person,
+  assign: Pin,
   author: Person,
   comment: Comment,
   invitation: Mail,
