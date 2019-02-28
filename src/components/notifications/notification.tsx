@@ -5,6 +5,7 @@ import { Comment, Event, Issue, Notification } from '../../types';
 import { Changes } from '../changes';
 import { NotificationIcon } from './notification-icon';
 import css from './notification.module.scss';
+import { ReasonIcon } from './reason-icon';
 
 interface NotificationItemProps {
   notification: Notification;
@@ -78,6 +79,7 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
       >
         <div className={css.notification__header}>
           {isLoading && <EuiProgress position="absolute" color="subdued" size="xs" />}
+          <ReasonIcon reason={notification.reason} />
           <NotificationIcon
             type={'base' in issue ? 'pr' : 'issue'}
             state={'merged' in issue && issue.merged ? 'merged' : issue.state}
