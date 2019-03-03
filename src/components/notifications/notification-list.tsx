@@ -28,6 +28,7 @@ export function NotificationList() {
 
   useEffect(() => {
     loadNots();
+    // TODO: somehow we need to "cancel" this request when navigating away
   }, []);
 
   useEffect(() => {
