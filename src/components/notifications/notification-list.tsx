@@ -1,12 +1,15 @@
 import { EuiLoadingSpinner } from '@elastic/eui';
+import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { useGitHub } from '../../services/github';
-import { Notification } from '../../types';
+import { useGitHub, useSetting } from '../../services';
+import { Notification as NotificationType } from '../../types';
 import { NotificationItem } from './notification';
 
 export function NotificationList() {
   const github = useGitHub();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isWebNotificationsActive] = useSetting('notifications_active');
+  const [lastWebNotificationShown, setLastWebNotificationShown] = useState<moment.Moment>(moment());
+  const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [focused, setFocused] = useState<number>(-1);
   const [isLoading, setLoading] = useState(true);
 
@@ -17,17 +20,39 @@ export function NotificationList() {
   }
 
   const loadNots = async () => {
-    setNotifications(await github.getUnreadNotifications());
+    const nots = await github.getUnreadNotifications();
+    // TODO: This should be extracted to a better place
+    if (isWebNotificationsActive) {
+      const newNotifications: NotificationType[] = [];
+      for (const n of nots) {
+        if (lastWebNotificationShown.isAfter(n.updated_at)) {
+          // Since notifications are sorted by updated date, we're breaking this loop
+          // as soon as we found the first "old" notifications
+          break;
+        }
+        newNotifications.push(n);
+      }
+      if (newNotifications.length > 0) {
+        // tslint:disable-next-line no-unused-expression -- web notification will be send via the constructor
+        new Notification(`${newNotifications.length} GitHub changes`, {
+          body: newNotifications.map(n => `* ${n.subject.title}`).join('\n'),
+          icon: '/octoface.png',
+        });
+      }
+      setLastWebNotificationShown(moment());
+    }
+    setNotifications(nots);
     setLoading(false);
   };
 
-  const checkNotification = async (notification: Notification) => {
+  const checkNotification = async (notification: NotificationType) => {
     await github.markNotificationAsRead(notification.id);
     await loadNots();
   };
 
   useEffect(() => {
     loadNots();
+    // TODO: somehow we need to "cancel" this request when navigating away
   }, []);
 
   useEffect(() => {

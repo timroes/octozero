@@ -1,4 +1,6 @@
 declare module '@elastic/eui' {
+  // --- EuiHeader ---
+
   interface EuiHeaderSectionProps {
     side?: 'left' | 'right';
     grow?: boolean;
@@ -17,4 +19,22 @@ declare module '@elastic/eui' {
   }
 
   export const EuiHeaderSectionItemButton: React.FunctionComponent<EuiHeaderSectionItemButtonProps>;
+
+  // --- List Group ---
+
+  interface EuiListGroupItemProps {
+    iconType: string;
+    isActive?: boolean;
+    label: string;
+    href: string;
+  }
+
+  export const EuiListGroupItem: React.FunctionComponent<EuiListGroupItemProps>;
+
+  interface EuiListGroupProps {
+    flush?: boolean;
+    className?: string;
+  }
+
+  export const EuiListGroup: React.FunctionComponent<EuiListGroupProps>;
 }

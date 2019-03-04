@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import {
   EuiAvatar,
   EuiHeaderSection,
   EuiHeaderSectionItem,
   EuiHeaderSectionItemButton,
+  EuiIcon,
 } from '@elastic/eui';
 
 import { useGitHub } from '../../services/github';
@@ -27,9 +29,16 @@ export function Header() {
   return (
     <div className={css.header}>
       <EuiHeaderSection side="left" grow={true}>
-        <EuiHeaderSectionItem border="none">this.productName</EuiHeaderSectionItem>
+        <EuiHeaderSectionItem border="none">
+          <Link to="/">this.productName</Link>
+        </EuiHeaderSectionItem>
       </EuiHeaderSection>
       <EuiHeaderSection side="right">
+        <EuiHeaderSectionItem>
+          <Link to="/settings" className={css.header__button} aria-label="Settings">
+            <EuiIcon type="gear" />
+          </Link>
+        </EuiHeaderSectionItem>
         <EuiHeaderSectionItem>
           {user && (
             <EuiHeaderSectionItemButton>
