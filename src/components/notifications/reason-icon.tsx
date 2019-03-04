@@ -4,6 +4,7 @@ import Octoicon, {
   Eye,
   Flame,
   Icon,
+  IssueReopened,
   Mail,
   Mention,
   Organization,
@@ -19,15 +20,15 @@ import React from 'react';
 import css from './reason-icon.module.scss';
 
 const REASON_ICONS: { [reason: string]: Icon } = {
-  assign: Pin,
-  author: Person,
+  assign: Person,
+  author: Pencil,
   comment: Comment,
   invitation: Mail,
   manual: Unmute,
   mention: Mention,
   review_requested: Eye,
   security_alert: Flame,
-  state_change: Pencil,
+  state_change: IssueReopened,
   subscribed: Repo,
   team_mention: Organization,
 };
