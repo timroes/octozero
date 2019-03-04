@@ -1,0 +1,20 @@
+@import "../../styles/mixins";
+
+.settings {
+  display: flex;
+}
+
+.settings__menu {
+  flex: 0 0 auto;
+  min-width: 180px;
+}
+
+.settings__main {
+  flex: 1 1 0;
+  overflow-x: auto;
+  padding: 1em;
+}
+
+.settings__title {
+  @extend %title;
+}
