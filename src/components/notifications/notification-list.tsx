@@ -98,16 +98,18 @@ export function NotificationList() {
   return (
     <div tabIndex={0} onKeyDown={onKeyDown}>
       {isLoading && <EuiLoadingSpinner size="xl" />}
-      {notifications.map((notification, index) => (
-        <NotificationItem
-          key={notification.id}
-          ref={itemRefs[index]}
-          notification={notification}
-          initialOpen={false}
-          onFocus={() => setFocused(index)}
-          onCheck={() => checkNotification(notification)}
-        />
-      ))}
+      {notifications
+        .filter(notification => ['Issue', 'PullRequest'].includes(notification.subject.type))
+        .map((notification, index) => (
+          <NotificationItem
+            key={notification.id}
+            ref={itemRefs[index]}
+            notification={notification}
+            initialOpen={false}
+            onFocus={() => setFocused(index)}
+            onCheck={() => checkNotification(notification)}
+          />
+        ))}
     </div>
   );
 }
