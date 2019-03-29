@@ -1,4 +1,4 @@
-import { EuiLoadingSpinner } from '@elastic/eui';
+import { EuiEmptyPrompt, EuiLoadingSpinner } from '@elastic/eui';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { useGitHub, useSetting } from '../../services';
@@ -95,21 +95,30 @@ export function NotificationList() {
     }
   };
 
+  const visibleNotifications = notifications.filter(notification =>
+    ['Issue', 'PullRequest'].includes(notification.subject.type)
+  );
+
   return (
     <div tabIndex={0} onKeyDown={onKeyDown}>
       {isLoading && <EuiLoadingSpinner size="xl" />}
-      {notifications
-        .filter(notification => ['Issue', 'PullRequest'].includes(notification.subject.type))
-        .map((notification, index) => (
-          <NotificationItem
-            key={notification.id}
-            ref={itemRefs[index]}
-            notification={notification}
-            initialOpen={false}
-            onFocus={() => setFocused(index)}
-            onCheck={() => checkNotification(notification)}
-          />
-        ))}
+      {!isLoading && visibleNotifications.length === 0 && (
+        <EuiEmptyPrompt
+          iconType="faceHappy"
+          title={<h2>You have no unread notifications</h2>}
+          body={<p>Enjoy your day!</p>}
+        />
+      )}
+      {visibleNotifications.map((notification, index) => (
+        <NotificationItem
+          key={notification.id}
+          ref={itemRefs[index]}
+          notification={notification}
+          initialOpen={false}
+          onFocus={() => setFocused(index)}
+          onCheck={() => checkNotification(notification)}
+        />
+      ))}
     </div>
   );
 }
