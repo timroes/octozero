@@ -45,6 +45,12 @@ export function NotificationList() {
     setLoading(false);
   };
 
+  const unsubscribeNotification = async (notification: NotificationType) => {
+    await github.markNotificationAsRead(notification.id);
+    await github.unsubscribeNotification(notification);
+    await loadNots();
+  };
+
   const checkNotification = async (notification: NotificationType) => {
     await github.markNotificationAsRead(notification.id);
     await loadNots();
@@ -117,6 +123,7 @@ export function NotificationList() {
           initialOpen={false}
           onFocus={() => setFocused(index)}
           onCheck={() => checkNotification(notification)}
+          onMute={() => unsubscribeNotification(notification)}
         />
       ))}
     </div>

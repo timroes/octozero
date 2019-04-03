@@ -49,6 +49,10 @@ class GitHubApi {
     return response.data;
   }
 
+  public async unsubscribeNotification(notification: Notification): Promise<void> {
+    await this.octokit.activity.deleteThreadSubscription({ thread_id: Number(notification.id) });
+  }
+
   public async loadIssueChanges(
     owner: string,
     repo: string,

@@ -11,6 +11,7 @@ interface NotificationItemProps {
   notification: Notification;
   onCheck: () => void;
   onFocus: () => void;
+  onMute: () => void;
   initialOpen?: boolean;
 }
 
@@ -19,7 +20,7 @@ interface NotificationItemComponentProps extends NotificationItemProps {
 }
 
 const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationItemComponentProps>(
-  ({ notification, issue, onCheck, initialOpen, onFocus }, ref) => {
+  ({ notification, issue, onCheck, initialOpen, onFocus, onMute }, ref) => {
     const github = useGitHub();
     const [open, setOpen] = useState(initialOpen);
 
@@ -52,6 +53,10 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
           break;
         case 'o':
           window.open(issue.html_url);
+          break;
+        case 'm':
+          setLoading(true);
+          onMute();
           break;
         case 'Enter':
         case 'Return':
