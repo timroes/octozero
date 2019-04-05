@@ -116,7 +116,7 @@ function AssignedEvent({ event }: EventProps) {
     <BaseComponent icon={Person}>
       {assigner.login === assginee.login ? (
         <>
-          {assigner.login} self-assigned this {moment(event.created_at).format()}
+          {assigner.login} self-assigned this {moment(event.created_at).fromNow()}
         </>
       ) : (
         <>
