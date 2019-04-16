@@ -85,12 +85,14 @@ export function NotificationList() {
     switch (event.key) {
       case 'Down': // IE/Edge Workaround
       case 'ArrowDown':
+      case 'j':
         event.preventDefault();
         event.stopPropagation();
         focusChild(focused + 1);
         break;
       case 'Up': // IE/Edge workaround
       case 'ArrowUp':
+      case 'k':
         event.preventDefault();
         event.stopPropagation();
         focusChild(focused - 1);
