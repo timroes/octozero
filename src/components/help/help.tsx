@@ -10,7 +10,7 @@ import {
 } from '@elastic/eui';
 
 import { Key } from '../key';
-import { HelpSection } from './help_section';
+import { HelpSection } from './help-section';
 
 interface HelpProps {
   onClose: () => void;
