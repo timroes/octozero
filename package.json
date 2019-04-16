@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@elastic/datemath": "^5.0.2",
-    "@elastic/eui": "^9.0.0",
+    "@elastic/eui": "^10.0.0",
     "@githubprimer/octicons-react": "^8.4.2",
     "@octokit/rest": "^16.15.0",
     "@types/classnames": "^2.2.7",
