@@ -125,7 +125,7 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
 
     useEffect(() => {
       github.getIssueForNotification(props.notification).then(setIssue);
-    }, [props.notification.id]);
+    }, [props.notification.id, props.notification.updated_at]);
 
     if (!issue) {
       return null;
