@@ -50,6 +50,10 @@ function KeyboardShortcutHelp() {
       title: <Key>m</Key>,
       description: 'Mute/Unsubscribe selected notification',
     },
+    {
+      title: <Key>.</Key>,
+      description: 'Show/hide original issue/PR comment',
+    },
   ];
   return (
     <HelpSection title="Keyboard Shortcuts" id="keyboardShortcuts">

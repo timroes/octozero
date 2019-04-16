@@ -1,8 +1,9 @@
 import { EuiBadge, EuiButtonIcon, EuiProgress } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
-import { useGitHub } from '../../services/github';
+import { useGitHub, useSetting } from '../../services';
 import { Comment, Event, Issue, Notification } from '../../types';
 import { Changes } from '../changes';
+import { CommentContent } from '../comments';
 import { NotificationIcon } from './notification-icon';
 import css from './notification.module.scss';
 import { ReasonIcon } from './reason-icon';
@@ -23,6 +24,8 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
   ({ notification, issue, onCheck, initialOpen, onFocus, onMute }, ref) => {
     const github = useGitHub();
     const [open, setOpen] = useState(initialOpen);
+    const [showInitialCommentSetting] = useSetting('general_showInitialCommentByDefault');
+    const [showInitialComment, setShowInitialComment] = useState(showInitialCommentSetting);
 
     const [changes, setChanges] = useState<Array<Comment | Event> | null>(null);
     const [isLoading, setLoading] = useState<boolean>(false);
@@ -57,6 +60,9 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
         case 'm':
           setLoading(true);
           onMute();
+          break;
+        case '.':
+          setShowInitialComment(!showInitialComment);
           break;
         case 'Enter':
         case 'Return':
@@ -112,7 +118,17 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
             onClick={() => window.open(issue.html_url)}
           />
         </div>
-        {open && <div>{changes && <Changes changes={changes} />}</div>}
+        {open && (
+          <div className={css.notification__content}>
+            {showInitialComment && (
+              <>
+                <CommentContent author={issue.user} time={issue.created_at} body={issue.body} />
+                <div className={css.notification__ellipsis}>⋮</div>
+              </>
+            )}
+            {changes && <Changes changes={changes} />}
+          </div>
+        )}
       </div>
     );
   }

@@ -1,6 +1,8 @@
 import { EuiListGroup, EuiListGroupItem } from '@elastic/eui';
 import React from 'react';
+import { RouteComponentProps, withRouter } from 'react-router';
 
+import { GeneralSettings } from './general-settings';
 import { NotificationSettings } from './notification-settings';
 
 import css from './settings.module.scss';
@@ -14,14 +16,21 @@ export function Settings({ page }: SettingsProps) {
     <div className={css.settings}>
       <EuiListGroup flush={true} className={css.settings__menu}>
         <EuiListGroupItem
+          iconType="gear"
+          isActive={page === 'general' || !page}
+          label="General"
+          href="/settings/general"
+        />
+        <EuiListGroupItem
           iconType="bell"
-          isActive={true}
+          isActive={page === 'notifications'}
           label="Notifications"
           href="/settings/notifications"
         />
       </EuiListGroup>
       <main className={css.settings__main}>
-        {(!page || page === 'notifications') && <NotificationSettings />}
+        {(!page || page === 'general') && <GeneralSettings />}
+        {page === 'notifications' && <NotificationSettings />}
       </main>
     </div>
   );

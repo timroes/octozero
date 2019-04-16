@@ -1,7 +1,6 @@
 import React from 'react';
 import { Comment, Event } from '../../types';
 import { CommentContent } from '../comments';
-import css from './changes.module.scss';
 import { EventComponent } from './event';
 
 function isEvent(change: Comment | Event): change is Event {
@@ -14,7 +13,7 @@ interface ChangesProps {
 
 export function Changes({ changes }: ChangesProps) {
   return (
-    <div className={css.changes}>
+    <div>
       {!changes.length && <em>No changes found</em>}
       {changes.map(change =>
         isEvent(change) ? (

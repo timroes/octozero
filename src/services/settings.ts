@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { BehaviorSubject } from 'rxjs';
 
 interface Settings {
+  general_showInitialCommentByDefault: boolean;
   notifications_active: boolean;
 }
 
 const settingDefaults: Settings = {
+  general_showInitialCommentByDefault: false,
   notifications_active: false,
 };
 
