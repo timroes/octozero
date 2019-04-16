@@ -9,6 +9,7 @@
     "interface-name": false,
     "jsx-no-lambda": false,
     "prettier": true,
-    "eofline": false
+    "eofline": false,
+    "object-literal-sort-keys": false
   }
 }
