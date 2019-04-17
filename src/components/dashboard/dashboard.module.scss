@@ -1,3 +1,5 @@
+@import "../../styles/variables";
+
 .dashboard {
   display: flex;
 }
@@ -10,4 +12,14 @@
 .dashboard__main {
   flex: 1 1 0;
   overflow-x: auto;
+}
+
+@include euiBreakpoint('xs','s') {
+  .dashboard {
+    flex-direction: column;
+  }
+
+  .dashboard__sidebar {
+    max-width: none !important;
+  }
 }
