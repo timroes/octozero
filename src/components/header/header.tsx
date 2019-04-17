@@ -71,7 +71,7 @@ export function HeaderComponent(props: RouteComponentProps) {
     <div className={css.header}>
       <EuiHeaderSection side="left" grow={true}>
         <EuiHeaderSectionItem border="none">
-          <Link to="/">this.productName</Link>
+          <Link to="/">OctoZero</Link>
         </EuiHeaderSectionItem>
       </EuiHeaderSection>
       <EuiHeaderSection side="right">
