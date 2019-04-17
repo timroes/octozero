@@ -1,28 +1,25 @@
 @import "../../styles/variables";
 
 .dashboard {
-  display: block;
+  display: flex;
 }
 
 .dashboard__sidebar {
-  min-width: 100%;
+  flex: 0 0 auto;
+  min-width: 180px;
 }
 
 .dashboard__main {
+  flex: 1 1 0;
   overflow-x: auto;
 }
 
-@media (min-width: $breakpoint-sm) {
+@include euiBreakpoint('xs','s') {
   .dashboard {
-    display: flex;
+    flex-direction: column;
   }
 
   .dashboard__sidebar {
-    flex: 0 0 auto;
-    min-width: 180px;
-  }
-
-  .dashboard__main {
-    flex: 1 1 0;
+    max-width: none !important;
   }
 }
