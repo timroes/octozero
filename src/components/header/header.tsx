@@ -32,7 +32,7 @@ export function HeaderComponent(props: RouteComponentProps) {
 
   useEffect(() => {
     loadUser();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const userButton = (
     <EuiHeaderSectionItemButton onClick={() => setUserMenuOpen(true)}>

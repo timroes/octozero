@@ -24,7 +24,7 @@ export function CommentContent({ body, author, time }: CommentContentProps) {
   return (
     <div className={css.comment}>
       <div className={css.comment__meta}>
-        <img src={author.avatar_url} className={css.comment__avatar} />
+        <img aria-hidden="true" alt="" src={author.avatar_url} className={css.comment__avatar} />
         <span className={css.comment__author}>{author.login}</span> commented{' '}
         {moment(time).fromNow()}
       </div>

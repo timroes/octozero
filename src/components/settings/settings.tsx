@@ -1,6 +1,5 @@
 import { EuiListGroup, EuiListGroupItem } from '@elastic/eui';
 import React from 'react';
-import { RouteComponentProps, withRouter } from 'react-router';
 
 import { GeneralSettings } from './general-settings';
 import { NotificationSettings } from './notification-settings';

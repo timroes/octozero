@@ -59,7 +59,7 @@ export function NotificationList() {
   useEffect(() => {
     loadNots();
     // TODO: somehow we need to "cancel" this request when navigating away
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     focusChild(focused);
@@ -82,6 +82,7 @@ export function NotificationList() {
   };
 
   const onKeyDown = (event: React.KeyboardEvent) => {
+    // eslint-disable-next-line default-case
     switch (event.key) {
       case 'Down': // IE/Edge Workaround
       case 'ArrowDown':

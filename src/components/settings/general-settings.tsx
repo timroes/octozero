@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { EuiFormRow, EuiSwitch } from '@elastic/eui';
 import { useSetting } from '../../services/settings';

@@ -44,6 +44,7 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
     };
 
     const onKeyDown = (event: React.KeyboardEvent) => {
+      // eslint-disable-next-line default-case
       switch (event.key) {
         case 'Escape':
           setOpen(false);
@@ -106,6 +107,7 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
           <span className={css.notification__repo}>
             <img
               src={notification.repository.owner.avatar_url}
+              alt=""
               aria-hidden="true"
               className={css.notification__repoIcon}
             />
@@ -141,7 +143,7 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
 
     useEffect(() => {
       github.getIssueForNotification(props.notification).then(setIssue);
-    }, [props.notification.id, props.notification.updated_at]);
+    }, [github, props.notification, props.notification.id, props.notification.updated_at]);
 
     if (!issue) {
       return null;

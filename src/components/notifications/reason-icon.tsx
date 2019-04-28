@@ -10,7 +10,6 @@ import Octoicon, {
   Organization,
   Pencil,
   Person,
-  Pin,
   PrimitiveDot,
   Repo,
   Unmute,

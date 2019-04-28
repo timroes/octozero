@@ -28,7 +28,7 @@ export function Login() {
         <EuiText>
           <p>
             To use this tool you'll need to create a{' '}
-            <a href="https://github.com/settings/tokens" target="_blank" rel="noopener noreferer">
+            <a href="https://github.com/settings/tokens" target="_blank" rel="noopener noreferrer">
               personal access token
             </a>{' '}
             on GitHub with the <EuiCode>repo</EuiCode> and <EuiCode>notifications</EuiCode>{' '}
