@@ -36,7 +36,7 @@ export function NotificationList() {
         // tslint:disable-next-line no-unused-expression -- web notification will be send via the constructor
         new Notification(`${newNotifications.length} GitHub changes`, {
           body: newNotifications.map(n => `* ${n.subject.title}`).join('\n'),
-          icon: '/octoface.png',
+          icon: '/octozero.png',
         });
       }
       setLastWebNotificationShown(moment());
