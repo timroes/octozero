@@ -4,7 +4,7 @@ import { useGitHub, useSetting } from '../../services';
 import { Comment, Event, Issue, Notification } from '../../types';
 import { Changes } from '../changes';
 import { CommentContent } from '../comments';
-import { NotificationIcon } from './notification-icon';
+import { IssueIcon } from '../issues';
 import css from './notification.module.scss';
 import { ReasonIcon } from './reason-icon';
 
@@ -92,10 +92,7 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
         <div className={css.notification__header}>
           {isLoading && <EuiProgress position="absolute" color="subdued" size="xs" />}
           <ReasonIcon reason={notification.reason} />
-          <NotificationIcon
-            type={'base' in issue ? 'pr' : 'issue'}
-            state={'merged' in issue && issue.merged ? 'merged' : issue.state}
-          />
+          <IssueIcon issue={issue} />
           <span className={css.notification__description}>
             <h2 className={css.notification__title}>{notification.subject.title}</h2>
             {issue.labels.map(label => (

@@ -1,0 +1,1 @@
+export { IssueIcon } from './issue-icon';

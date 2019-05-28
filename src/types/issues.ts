@@ -1,6 +1,7 @@
 import Octokit from '@octokit/rest';
 
-export type Issue = Octokit.IssuesGetResponse | Octokit.PullsGetResponse;
+export type PR = Octokit.PullsGetResponse;
+export type Issue = Octokit.IssuesGetResponse | PR;
 export type Comment = Octokit.IssuesListCommentsResponseItem;
 
 export interface AssignEvent extends Octokit.IssuesListEventsForRepoResponseItem {
