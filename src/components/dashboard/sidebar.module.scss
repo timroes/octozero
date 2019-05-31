@@ -1,0 +1,16 @@
+@import "../../styles/variables";
+
+.sidebar__link {
+  display: flex;
+  width: 100%;
+  padding: $euiSizeS;
+}
+
+.sidebar__link:focus .sidebar__linkText,
+.sidebar__link:hover .sidebar__linkText {
+  text-decoration: underline;
+}
+
+.sidebar__linkText {
+  flex: 1 1 auto;
+}

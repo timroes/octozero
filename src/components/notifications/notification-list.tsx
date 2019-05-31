@@ -2,10 +2,14 @@ import { EuiEmptyPrompt, EuiLoadingSpinner } from '@elastic/eui';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { useGitHub, useSetting } from '../../services';
-import { Notification as NotificationType } from '../../types';
+import { Notification as NotificationType, Notification } from '../../types';
 import { NotificationItem } from './notification';
 
-export function NotificationList() {
+interface NotificationListProps {
+  onNotificationsChange: (nots: Notification[]) => void;
+}
+
+export function NotificationList(props: NotificationListProps) {
   const github = useGitHub();
   const [isWebNotificationsActive] = useSetting('notifications_active');
   const [lastWebNotificationShown, setLastWebNotificationShown] = useState<moment.Moment>(moment());
@@ -41,6 +45,7 @@ export function NotificationList() {
       }
       setLastWebNotificationShown(moment());
     }
+    props.onNotificationsChange(nots);
     setNotifications(nots);
     setLoading(false);
   };
