@@ -36,8 +36,7 @@ class GitHubApi {
   }
 
   public async getUnreadNotifications(): Promise<Notification[]> {
-    const notifications = await this.octokit.activity.listNotifications({ per_page: 100 });
-    return notifications.data;
+    return await this.octokit.paginate(this.octokit.activity.listNotifications.endpoint.merge({ per_page: 50 }));
   }
 
   public async getIssueForNotification(notification: Notification): Promise<Issue> {
