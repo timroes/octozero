@@ -59,7 +59,7 @@ class GitHubApi {
     since?: string
   ): Promise<Array<Comment | Event>> {
     const params: Octokit.IssuesListCommentsParams = {
-      number: issue,
+      issue_number: issue,
       owner,
       per_page: 100,
       repo,
