@@ -2,11 +2,11 @@ import { EuiEmptyPrompt, EuiLoadingSpinner } from '@elastic/eui';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { useGitHub, useSetting } from '../../services';
-import { Notification as NotificationType, Notification } from '../../types';
+import { Notification as NotificationType } from '../../types';
 import { NotificationItem } from './notification';
 
 interface NotificationListProps {
-  onNotificationsChange: (nots: Notification[]) => void;
+  onNotificationsChange: (nots: NotificationType[]) => void;
 }
 
 export function NotificationList(props: NotificationListProps) {
