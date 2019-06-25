@@ -1,4 +1,4 @@
-import { EuiBadge, EuiButtonIcon, EuiProgress } from '@elastic/eui';
+import { EuiAvatar, EuiBadge, EuiButtonIcon, EuiProgress } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
 import { useGitHub, useSetting } from '../../services';
 import { Comment, Event, Issue, Notification } from '../../types';
@@ -110,6 +110,7 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
             />
             {notification.repository.owner.login}/{notification.repository.name}
           </span>
+          <EuiAvatar type="space" imageUrl={issue.user.avatar_url} name={issue.user.login} size="s" className={css.notification__author} />
           <EuiButtonIcon iconType="check" aria-label="Done" onClick={() => onCheck()} />
           <EuiButtonIcon
             iconType="popout"
