@@ -126,7 +126,7 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
                 <div className={css.notification__ellipsis}>⋮</div>
               </>
             )}
-            {changes && <Changes changes={changes} />}
+            {changes && <Changes changes={changes} issue={issue} />}
           </div>
         )}
       </div>

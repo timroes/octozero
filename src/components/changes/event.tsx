@@ -7,6 +7,7 @@ import Octicon, {
   PrimitiveDot,
   RepoPush,
   Tag,
+  GitMerge,
 } from '@githubprimer/octicons-react';
 import className from 'classnames';
 import moment from 'moment';
@@ -17,13 +18,14 @@ import {
   Event,
   LabelEvent,
   ReviewRequestedEvent as ReviewRequestedEventType,
+  Issue,
 } from '../../types';
 
 import css from './event.module.scss';
 
 interface BaseComponentProps {
   icon: Icon;
-  color?: 'red' | 'green';
+  color?: 'red' | 'green' | 'purple';
   children: React.ReactNode;
 }
 
@@ -31,6 +33,7 @@ function BaseComponent({ icon, color, children }: BaseComponentProps) {
   const iconClass = className(css.event__icon, {
     [css['event__icon--red']]: color === 'red',
     [css['event__icon--green']]: color === 'green',
+    [css['event__icon--purple']]: color === 'purple',
   });
   return (
     <React.Fragment>
@@ -42,14 +45,24 @@ function BaseComponent({ icon, color, children }: BaseComponentProps) {
   );
 }
 
-function ClosedEvent({ event }: EventProps) {
-  return (
-    <BaseComponent icon={CircleSlash} color="red">
-      {event.actor.login} closed this{' '}
-      {event.commit_id && <React.Fragment>via {event.commit_id} </React.Fragment>}
-      {moment(event.created_at).fromNow()}
-    </BaseComponent>
-  );
+function ClosedEvent({ event, issue }: EventProps) {
+  if ('base' in issue && issue.merged) {
+    return (
+      <BaseComponent icon={GitMerge} color="purple">
+        {event.actor.login} merged this{' '}
+        {event.commit_id && <React.Fragment>via {event.commit_id} </React.Fragment>}
+        {moment(event.created_at).fromNow()}
+      </BaseComponent>
+    );
+  } else {
+    return (
+      <BaseComponent icon={CircleSlash} color="red">
+        {event.actor.login} closed this{' '}
+        {event.commit_id && <React.Fragment>via {event.commit_id} </React.Fragment>}
+        {moment(event.created_at).fromNow()}
+      </BaseComponent>
+    );
+  }
 }
 
 function ReopenedEvent({ event }: EventProps) {
@@ -141,16 +154,17 @@ const EVENT_COMPONENTS: { [eventName: string]: React.FunctionComponent<EventProp
 
 interface EventProps {
   event: Event;
+  issue: Issue;
 }
 
-export function EventComponent({ event }: EventProps) {
+export function EventComponent({ event, issue }: EventProps) {
   const Component = EVENT_COMPONENTS[event.event];
   if (!Component) {
     return null;
   }
   return (
     <div className={css.event}>
-      <Component event={event} />
+      <Component event={event} issue={issue} />
     </div>
   );
 }
