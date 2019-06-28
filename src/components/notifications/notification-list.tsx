@@ -38,10 +38,14 @@ export function NotificationList(props: NotificationListProps) {
       }
       if (newNotifications.length > 0) {
         // tslint:disable-next-line no-unused-expression -- web notification will be send via the constructor
-        new Notification(`${newNotifications.length} GitHub changes`, {
+        const notification = new Notification(`${newNotifications.length} GitHub changes`, {
           body: newNotifications.map(n => `* ${n.subject.title}`).join('\n'),
           icon: '/octozero.png',
         });
+        notification.onclick = function() {
+          window.focus();
+          this.close();
+        };
       }
       setLastWebNotificationShown(moment());
     }
