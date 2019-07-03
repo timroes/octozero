@@ -26,7 +26,7 @@ export function IssueIcon({ issue }: IssueIconProps) {
   if (isPr(issue)) {
     const prClasses = className(classes, {
       [css['issue-icon--merged']]: issue.merged,
-      [css['issue-icon--draft']]: issue.mergeable_state === 'draft',
+      [css['issue-icon--draft']]: issue.mergeable_state === 'draft' && issue.state === 'open',
     });
     return (
       <span className={prClasses}>
