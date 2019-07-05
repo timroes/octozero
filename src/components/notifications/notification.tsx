@@ -43,6 +43,13 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
       setLoading(false);
     };
 
+    const markAsDone = (event: React.MouseEvent | React.KeyboardEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setLoading(true);
+      onCheck();
+    };
+
     const onKeyDown = (event: React.KeyboardEvent) => {
       // eslint-disable-next-line default-case
       switch (event.key) {
@@ -50,10 +57,7 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
           setOpen(false);
           break;
         case 'e':
-          event.preventDefault();
-          event.stopPropagation();
-          setLoading(true);
-          onCheck();
+          markAsDone(event);
           break;
         case 'o':
           window.open(issue.html_url);
@@ -111,7 +115,7 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
             {notification.repository.owner.login}/{notification.repository.name}
           </span>
           <EuiAvatar type="space" imageUrl={issue.user.avatar_url} name={issue.user.login} size="s" className={css.notification__author} />
-          <EuiButtonIcon iconType="check" aria-label="Done" onClick={() => onCheck()} />
+          <EuiButtonIcon iconType="check" aria-label="Done" onClick={markAsDone} />
           <EuiButtonIcon
             iconType="popout"
             aria-label="Open on GitHub"
