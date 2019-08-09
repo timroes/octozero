@@ -41,6 +41,10 @@
   margin-right: 0.4em;
 }
 
+.notification__title--highlight {
+  font-weight: bold;
+}
+
 .notification__repo {
   flex: 0 1 auto;
   display: flex;

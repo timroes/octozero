@@ -3,11 +3,13 @@ import { BehaviorSubject } from 'rxjs';
 
 interface Settings {
   general_showInitialCommentByDefault: boolean;
+  general_highlightMentions: boolean;
   notifications_active: boolean;
 }
 
 const settingDefaults: Settings = {
   general_showInitialCommentByDefault: false,
+  general_highlightMentions: false,
   notifications_active: false,
 };
 

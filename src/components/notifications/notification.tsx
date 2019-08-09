@@ -1,5 +1,6 @@
 import { EuiAvatar, EuiBadge, EuiButtonIcon, EuiProgress } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
+import className from 'classnames';
 import { useGitHub, useSetting } from '../../services';
 import { Comment, Event, Issue, Notification } from '../../types';
 import { Changes } from '../changes';
@@ -25,6 +26,7 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
     const github = useGitHub();
     const [open, setOpen] = useState(initialOpen);
     const [showInitialCommentSetting] = useSetting('general_showInitialCommentByDefault');
+    const [highlightMentions] = useSetting('general_highlightMentions');
     const [showInitialComment, setShowInitialComment] = useState(showInitialCommentSetting);
 
     const [changes, setChanges] = useState<Array<Comment | Event> | null>(null);
@@ -77,6 +79,12 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
       }
     };
 
+    const isHighlighted = highlightMentions && notification.reason === 'mention';
+
+    const titleClass = className(css.notification__title, {
+      [css['notification__title--highlight']]: isHighlighted,
+    });
+
     return (
       <div
         id={notification.id}
@@ -95,10 +103,10 @@ const NotificationItemComponent = React.forwardRef<HTMLDivElement, NotificationI
       >
         <div className={css.notification__header}>
           {isLoading && <EuiProgress position="absolute" color="subdued" size="xs" />}
-          <ReasonIcon reason={notification.reason} />
+          <ReasonIcon reason={notification.reason} highlight={isHighlighted} />
           <IssueIcon issue={issue} />
           <span className={css.notification__description}>
-            <h2 className={css.notification__title}>{notification.subject.title}</h2>
+            <h2 className={titleClass}>{notification.subject.title}</h2>
             {issue.labels.map(label => (
               <EuiBadge key={label.id} color={`#${label.color}`}>
                 {label.name}

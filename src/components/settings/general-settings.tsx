@@ -9,6 +9,9 @@ export function GeneralSettings() {
   const [showInitialComment, setShowInitialComment] = useSetting(
     'general_showInitialCommentByDefault'
   );
+  const [highlightMentions, setHighlightMentions] = useSetting(
+    'general_highlightMentions'
+  );
 
   return (
     <React.Fragment>
@@ -18,6 +21,13 @@ export function GeneralSettings() {
           label="Show original issue/PR comment by default"
           checked={showInitialComment}
           onChange={ev => setShowInitialComment(ev.target.checked)}
+        />
+      </EuiFormRow>
+      <EuiFormRow>
+        <EuiSwitch
+          label="Highlight notifications caused by personal mentions"
+          checked={highlightMentions}
+          onChange={ev => setHighlightMentions(ev.target.checked)}
         />
       </EuiFormRow>
     </React.Fragment>

@@ -14,6 +14,7 @@ import Octoicon, {
   Repo,
   Unmute,
 } from '@githubprimer/octicons-react';
+import className from 'classnames';
 import React from 'react';
 
 import css from './reason-icon.module.scss';
@@ -48,14 +49,18 @@ const REASON_LABELS: { [reason: string]: string } = {
 
 interface ReasonIconProps {
   reason: string;
+  highlight?: boolean;
 }
 
-export function ReasonIcon({ reason }: ReasonIconProps) {
+export function ReasonIcon({ reason, highlight }: ReasonIconProps) {
   const Ic = REASON_ICONS[reason] || PrimitiveDot;
   const text = REASON_LABELS[reason] || 'No idea why you are getting this notification ¯\\_(ツ)_/¯';
+  const iconClass = className(css['reason-icon'], {
+    [css['reason-icon--highlight']]: highlight,
+  });
   return (
     <EuiToolTip content={text} position="right">
-      <span className={css['reason-icon']}>
+      <span className={iconClass}>
         <Octoicon icon={Ic} />
       </span>
     </EuiToolTip>
