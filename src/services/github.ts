@@ -1,4 +1,4 @@
-import Octokit from '@octokit/rest';
+import Octokit, { ActivityListNotificationsForRepoParams, ActivityListNotificationsForRepoResponseItem } from '@octokit/rest';
 import moment from 'moment';
 import React, { useContext } from 'react';
 import { getLogin, loginToken$ } from './login';
@@ -11,6 +11,24 @@ const OCTOKIT_OPTIONS = {
     'if-none-match': '',
   },
 };
+
+function getReposFromLocationSearch(search: string): ActivityListNotificationsForRepoParams[] | undefined {
+  const urlParams = new URLSearchParams(search);
+  const repoList = urlParams.get('repos');
+  if (!repoList) {
+    return undefined;
+  }
+  return repoList.split(',').reduce<ActivityListNotificationsForRepoParams[]>((acc, repoName)=> {
+    if (repoName.indexOf('/') >= 0) {
+      const [owner, repo] = repoName.split('/');
+      return [...acc, {
+        owner,
+        repo,
+      }]
+    }
+    return acc;
+  }, []);
+}
 
 class GitHubApi {
   private octokit: Octokit;
@@ -35,9 +53,25 @@ class GitHubApi {
     return user.data;
   }
 
-  public async getUnreadNotifications(): Promise<Notification[]> {
-    const notifications = await this.octokit.activity.listNotifications({ per_page: 100 });
+  public async getUnreadNotifications(repoList?: ActivityListNotificationsForRepoParams[]): Promise<Notification[]> {
+    if (!repoList || repoList.length === 0) {
+      return this.getAllUnreadNotification();
+    }
+    return this.getUnreadNotificationFromRepos(repoList);
+  }
+
+  public async getAllUnreadNotification(): Promise<Notification[]> {
+    const notifications = await this.octokit.activity.listNotifications({per_page: 100});
     return notifications.data;
+  }
+
+  public async getUnreadNotificationFromRepos(repos: ActivityListNotificationsForRepoParams[]): Promise<Notification[]> {
+    const notifications = await Promise.all(repos.map(repo => {
+      return this.octokit.activity.listNotificationsForRepo(repo);
+    }))
+    return notifications.reduce<ActivityListNotificationsForRepoResponseItem[]>((acc, d) => {
+      return [...acc, ...d.data]
+    }, []);
   }
 
   public async getIssueForNotification(notification: Notification): Promise<Issue> {
@@ -101,4 +135,4 @@ function useGitHub() {
   return useContext(GitHubContext);
 }
 
-export { GitHubApi, GitHubContext, useGitHub };
+export { GitHubApi, GitHubContext, useGitHub, getReposFromLocationSearch };
