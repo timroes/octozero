@@ -1,4 +1,5 @@
 import { EuiEmptyPrompt, EuiLoadingSpinner } from '@elastic/eui';
+import Octokit from '@octokit/rest';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { useGitHub, useSetting } from '../../services';
@@ -6,6 +7,7 @@ import { Notification as NotificationType } from '../../types';
 import { NotificationItem } from './notification';
 
 interface NotificationListProps {
+  repos?: Octokit.ActivityListNotificationsForRepoParams[],
   onNotificationsChange: (nots: NotificationType[]) => void;
 }
 
@@ -24,7 +26,7 @@ export function NotificationList(props: NotificationListProps) {
   }
 
   const loadNots = async () => {
-    const nots = await github.getUnreadNotifications();
+    const nots = await github.getUnreadNotifications(props.repos);
     // TODO: This should be extracted to a better place
     if (isWebNotificationsActive) {
       const newNotifications: NotificationType[] = [];

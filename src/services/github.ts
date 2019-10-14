@@ -12,6 +12,27 @@ const OCTOKIT_OPTIONS = {
   },
 };
 
+function getReposFromLocationSearch(search: string): Octokit.ActivityListNotificationsForRepoParams[] | undefined {
+  const urlParams = new URLSearchParams(search);
+  const repoList = urlParams.get('repos');
+  if(!repoList) {
+    return undefined;
+  }
+  return repoList.split(',').map((repoName)=> {
+    if(repoName.indexOf('/') >=0) {
+      const [owner, repo] = repoName.split('/');
+      return {
+        owner,
+        repo,
+      }
+    }
+    return {
+      owner: 'elastic',
+      repo: repoName,
+    }
+  })
+}
+
 class GitHubApi {
   private octokit: Octokit;
 
@@ -35,9 +56,25 @@ class GitHubApi {
     return user.data;
   }
 
-  public async getUnreadNotifications(): Promise<Notification[]> {
-    const notifications = await this.octokit.activity.listNotifications({ per_page: 100 });
+  public async getUnreadNotifications(repoList?: Octokit.ActivityListNotificationsForRepoParams[]): Promise<Notification[]> {
+    if (!repoList || repoList.length === 0) {
+      return this.getAllUnreadNotification();
+    }
+    return this.getUnreadNotificationFromRepos(repoList);
+  }
+
+  public async getAllUnreadNotification(): Promise<Notification[]> {
+    const notifications = await this.octokit.activity.listNotifications({per_page: 100});
     return notifications.data;
+  }
+
+  public async getUnreadNotificationFromRepos(repos: Octokit.ActivityListNotificationsForRepoParams[]): Promise<Notification[]> {
+    const notifications = await Promise.all(repos.map(repo => {
+      return this.octokit.activity.listNotificationsForRepo(repo);
+    }))
+    return notifications.reduce<Octokit.ActivityListNotificationsForRepoResponseItem[]>((acc, d) => {
+      return [...acc, ...d.data]
+    }, []);
   }
 
   public async getIssueForNotification(notification: Notification): Promise<Issue> {
@@ -101,4 +138,4 @@ function useGitHub() {
   return useContext(GitHubContext);
 }
 
-export { GitHubApi, GitHubContext, useGitHub };
+export { GitHubApi, GitHubContext, useGitHub, getReposFromLocationSearch };
