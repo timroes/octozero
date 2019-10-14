@@ -1,4 +1,4 @@
-import Octokit from '@octokit/rest';
+import Octokit, { ActivityListNotificationsForRepoParams, ActivityListNotificationsForRepoResponseItem } from '@octokit/rest';
 import moment from 'moment';
 import React, { useContext } from 'react';
 import { getLogin, loginToken$ } from './login';
@@ -12,25 +12,22 @@ const OCTOKIT_OPTIONS = {
   },
 };
 
-function getReposFromLocationSearch(search: string): Octokit.ActivityListNotificationsForRepoParams[] | undefined {
+function getReposFromLocationSearch(search: string): ActivityListNotificationsForRepoParams[] | undefined {
   const urlParams = new URLSearchParams(search);
   const repoList = urlParams.get('repos');
-  if(!repoList) {
+  if (!repoList) {
     return undefined;
   }
-  return repoList.split(',').map((repoName)=> {
-    if(repoName.indexOf('/') >=0) {
+  return repoList.split(',').reduce<ActivityListNotificationsForRepoParams[]>((acc, repoName)=> {
+    if (repoName.indexOf('/') >= 0) {
       const [owner, repo] = repoName.split('/');
-      return {
+      return [...acc, {
         owner,
         repo,
-      }
+      }]
     }
-    return {
-      owner: 'elastic',
-      repo: repoName,
-    }
-  })
+    return acc;
+  }, []);
 }
 
 class GitHubApi {
@@ -56,7 +53,7 @@ class GitHubApi {
     return user.data;
   }
 
-  public async getUnreadNotifications(repoList?: Octokit.ActivityListNotificationsForRepoParams[]): Promise<Notification[]> {
+  public async getUnreadNotifications(repoList?: ActivityListNotificationsForRepoParams[]): Promise<Notification[]> {
     if (!repoList || repoList.length === 0) {
       return this.getAllUnreadNotification();
     }
@@ -68,11 +65,11 @@ class GitHubApi {
     return notifications.data;
   }
 
-  public async getUnreadNotificationFromRepos(repos: Octokit.ActivityListNotificationsForRepoParams[]): Promise<Notification[]> {
+  public async getUnreadNotificationFromRepos(repos: ActivityListNotificationsForRepoParams[]): Promise<Notification[]> {
     const notifications = await Promise.all(repos.map(repo => {
       return this.octokit.activity.listNotificationsForRepo(repo);
     }))
-    return notifications.reduce<Octokit.ActivityListNotificationsForRepoResponseItem[]>((acc, d) => {
+    return notifications.reduce<ActivityListNotificationsForRepoResponseItem[]>((acc, d) => {
       return [...acc, ...d.data]
     }, []);
   }
