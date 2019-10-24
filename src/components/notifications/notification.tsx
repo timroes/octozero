@@ -151,9 +151,15 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
     const github = useGitHub();
     const [issue, setIssue] = useState<Issue | null>(null);
 
-    useEffect(() => {
-      github.getIssueForNotification(props.notification).then(setIssue);
-    }, [github, props.notification, props.notification.id, props.notification.updated_at]);
+    useEffect(
+      () => {
+        github.getIssueForNotification(props.notification).then(setIssue);
+      },
+      // Reason: The notification object might change on every refresh, but we don't need to refresh the issue as
+      // long as the underlying notification is the same (same id and same updated_at).
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [github, props.notification.id, props.notification.updated_at]
+    );
 
     if (!issue) {
       return null;
