@@ -53,21 +53,21 @@ class GitHubApi {
     return user.data;
   }
 
-  public async getUnreadNotifications(repoList?: ActivityListNotificationsForRepoParams[]): Promise<Notification[]> {
+  public async getUnreadNotifications(repoList?: ActivityListNotificationsForRepoParams[], options: { signal?: AbortSignal } = {}): Promise<Notification[]> {
     if (!repoList || repoList.length === 0) {
-      return this.getAllUnreadNotification();
+      return this.getAllUnreadNotification(options);
     }
-    return this.getUnreadNotificationFromRepos(repoList);
+    return this.getUnreadNotificationFromRepos(repoList, options);
   }
 
-  public async getAllUnreadNotification(): Promise<Notification[]> {
-    const notifications = await this.octokit.activity.listNotifications({per_page: 100});
+  public async getAllUnreadNotification(options: { signal?: AbortSignal } = {}): Promise<Notification[]> {
+    const notifications = await this.octokit.activity.listNotifications({per_page: 100, request: { signal: options.signal }});
     return notifications.data;
   }
 
-  public async getUnreadNotificationFromRepos(repos: ActivityListNotificationsForRepoParams[]): Promise<Notification[]> {
+  public async getUnreadNotificationFromRepos(repos: ActivityListNotificationsForRepoParams[], options: { signal?: AbortSignal } = {}): Promise<Notification[]> {
     const notifications = await Promise.all(repos.map(repo => {
-      return this.octokit.activity.listNotificationsForRepo(repo);
+      return this.octokit.activity.listNotificationsForRepo({ ...repo, request: { signal: options.signal } });
     }))
     return notifications.reduce<ActivityListNotificationsForRepoResponseItem[]>((acc, d) => {
       return [...acc, ...d.data]

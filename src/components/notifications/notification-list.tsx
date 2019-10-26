@@ -1,23 +1,27 @@
-import { EuiEmptyPrompt, EuiLoadingSpinner } from '@elastic/eui';
+import { EuiEmptyPrompt, EuiPortal, EuiProgress } from '@elastic/eui';
 import Octokit from '@octokit/rest';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { useGitHub, useSetting } from '../../services';
 import { Notification as NotificationType } from '../../types';
 import { NotificationItem } from './notification';
+import { useCounter } from '../../utils/hooks';
 
 interface NotificationListProps {
   repos?: Octokit.ActivityListNotificationsForRepoParams[],
   onNotificationsChange: (nots: NotificationType[]) => void;
 }
 
+// TODO: This component has become a huge mess and needs to be cleaned up properly
 export function NotificationList(props: NotificationListProps) {
   const github = useGitHub();
   const [isWebNotificationsActive] = useSetting('notifications_active');
   const [lastWebNotificationShown, setLastWebNotificationShown] = useState<moment.Moment>(moment());
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [focused, setFocused] = useState<number>(-1);
-  const [isLoading, setLoading] = useState(true);
+  const [loadingCounter, increaseLoadingCounter, decreaseLoadingCounter] = useCounter(0);
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
+  const [hasLoaded, setLoaded] = useState(false);
 
   const itemRefs: Array<React.RefObject<HTMLDivElement>> = [];
   // tslint:disable-next-line prefer-for-of
@@ -25,45 +29,61 @@ export function NotificationList(props: NotificationListProps) {
     itemRefs.push(React.createRef());
   }
 
-  const loadNots = async () => {
-    const nots = await github.getUnreadNotifications(props.repos);
-    // TODO: This should be extracted to a better place
-    if (isWebNotificationsActive) {
-      const newNotifications: NotificationType[] = [];
-      for (const n of nots) {
-        if (lastWebNotificationShown.isAfter(n.updated_at)) {
-          // Since notifications are sorted by updated date, we're breaking this loop
-          // as soon as we found the first "old" notifications
-          break;
-        }
-        newNotifications.push(n);
-      }
-      if (newNotifications.length > 0) {
-        // tslint:disable-next-line no-unused-expression -- web notification will be send via the constructor
-        const notification = new Notification(`${newNotifications.length} GitHub changes`, {
-          body: newNotifications.map(n => `* ${n.subject.title}`).join('\n'),
-          icon: '/octozero.png',
-        });
-        notification.onclick = function() {
-          window.focus();
-          this.close();
-        };
-      }
-      setLastWebNotificationShown(moment());
+  function abortRunningNotificationRequest() {
+    if (abortController) {
+      abortController.abort();
     }
-    props.onNotificationsChange(nots);
-    setNotifications(nots);
-    setLoading(false);
+  }
+
+  const loadNots = () => {
+    if (loadingCounter > 0) return;
+    increaseLoadingCounter();
+    const controller = new AbortController();
+    setAbortController(controller);
+    return github.getUnreadNotifications(props.repos, { signal: controller.signal })
+      .then(nots => {;
+        // TODO: This should be extracted to a better place
+        if (isWebNotificationsActive) {
+          const newNotifications: NotificationType[] = [];
+          for (const n of nots) {
+            if (lastWebNotificationShown.isAfter(n.updated_at)) {
+              // Since notifications are sorted by updated date, we're breaking this loop
+              // as soon as we found the first "old" notifications
+              break;
+            }
+            newNotifications.push(n);
+          }
+          if (newNotifications.length > 0) {
+            // tslint:disable-next-line no-unused-expression -- web notification will be send via the constructor
+            const notification = new Notification(`${newNotifications.length} GitHub changes`, {
+              body: newNotifications.map(n => `* ${n.subject.title}`).join('\n'),
+              icon: '/octozero.png',
+            });
+            notification.onclick = function() {
+              window.focus();
+              this.close();
+            };
+          }
+          setLastWebNotificationShown(moment());
+        }
+        props.onNotificationsChange(nots);
+        setNotifications(nots);
+        setLoaded(true);
+      }).finally(() => {
+        setAbortController(null)
+        decreaseLoadingCounter();
+      });
   };
 
-  const unsubscribeNotification = async (notification: NotificationType) => {
+  const checkNotification = async (notification: NotificationType, unsubscribe: boolean = false) => {
+    abortRunningNotificationRequest();
+    increaseLoadingCounter();
+    setNotifications(notifications.filter(n => n.id !== notification.id));
     await github.markNotificationAsRead(notification.id);
-    await github.unsubscribeNotification(notification);
-    await loadNots();
-  };
-
-  const checkNotification = async (notification: NotificationType) => {
-    await github.markNotificationAsRead(notification.id);
+    if (unsubscribe) {
+      await github.unsubscribeNotification(notification);
+    }
+    decreaseLoadingCounter();
     await loadNots();
   };
 
@@ -121,8 +141,12 @@ export function NotificationList(props: NotificationListProps) {
 
   return (
     <div tabIndex={0} onKeyDown={onKeyDown}>
-      {isLoading && <EuiLoadingSpinner size="xl" />}
-      {!isLoading && visibleNotifications.length === 0 && (
+      {loadingCounter > 0 && (
+        <EuiPortal>
+          <EuiProgress size="xs" color="accent" position="fixed" />
+        </EuiPortal>
+      )}
+      {hasLoaded && visibleNotifications.length === 0 && (
         <EuiEmptyPrompt
           iconType="faceHappy"
           title={<h2>You have no unread notifications</h2>}
@@ -137,7 +161,7 @@ export function NotificationList(props: NotificationListProps) {
           initialOpen={false}
           onFocus={() => setFocused(index)}
           onCheck={() => checkNotification(notification)}
-          onMute={() => unsubscribeNotification(notification)}
+          onMute={() => checkNotification(notification, true)}
         />
       ))}
     </div>
