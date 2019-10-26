@@ -1,52 +1,85 @@
 import { EuiEmptyPrompt, EuiPortal, EuiProgress } from '@elastic/eui';
 import Octokit from '@octokit/rest';
 import moment from 'moment';
-import React, { useEffect, useState } from 'react';
-import { useGitHub, useSetting } from '../../services';
+import React from 'react';
+import { GitHubContext, getSetting } from '../../services';
 import { Notification as NotificationType } from '../../types';
 import { NotificationItem } from './notification';
-import { useCounter } from '../../utils/hooks';
+import debounce from 'lodash.debounce';
+import { EuiLoadingSpinner } from '@elastic/eui';
 
 interface NotificationListProps {
   repos?: Octokit.ActivityListNotificationsForRepoParams[],
   onNotificationsChange: (nots: NotificationType[]) => void;
 }
 
-// TODO: This component has become a huge mess and needs to be cleaned up properly
-export function NotificationList(props: NotificationListProps) {
-  const github = useGitHub();
-  const [isWebNotificationsActive] = useSetting('notifications_active');
-  const [lastWebNotificationShown, setLastWebNotificationShown] = useState<moment.Moment>(moment());
-  const [notifications, setNotifications] = useState<NotificationType[]>([]);
-  const [focused, setFocused] = useState<number>(-1);
-  const [loadingCounter, increaseLoadingCounter, decreaseLoadingCounter] = useCounter(0);
-  const [abortController, setAbortController] = useState<AbortController | null>(null);
-  const [hasLoaded, setLoaded] = useState(false);
+interface State {
+  notifications?: NotificationType[];
+  lastWebNotificationShown: moment.Moment;
+  focusedItem: number;
+  isLoading: boolean;
+}
 
-  const itemRefs: Array<React.RefObject<HTMLDivElement>> = [];
-  // tslint:disable-next-line prefer-for-of
-  for (let i = 0; i < notifications.length; i++) {
-    itemRefs.push(React.createRef());
-  }
+export class NotificationList extends React.Component<NotificationListProps, State> { 
+  static contextType = GitHubContext;
+  context!: React.ContextType<typeof GitHubContext>;
 
-  function abortRunningNotificationRequest() {
-    if (abortController) {
-      abortController.abort();
+  private notificationsRequestAbort?: AbortController;
+  private loadingCounter: number = 0;
+  private intervalRefreshId?: number;
+  private itemRefs: Array<React.RefObject<HTMLDivElement>> = [];
+
+  constructor(props: NotificationListProps) {
+    super(props);
+    this.state = {
+      lastWebNotificationShown: moment(),
+      focusedItem: -1,
+      isLoading: true,
     }
   }
 
-  const loadNots = () => {
-    if (loadingCounter > 0) return;
-    increaseLoadingCounter();
-    const controller = new AbortController();
-    setAbortController(controller);
-    return github.getUnreadNotifications(props.repos, { signal: controller.signal })
+  private setLoadingState() {
+    this.setState({
+      isLoading: this.loadingCounter > 0 || Boolean(this.notificationsRequestAbort),
+    });
+  }
+
+  private async checkNotification(notification: NotificationType, unsubscribe: boolean = false) {
+    // In case the user checks a notification we cancel any pending and abort tunning notifications load
+    if (this.notificationsRequestAbort) {
+      this.notificationsRequestAbort.abort();
+    }
+    this.debouncedLoadNotifications.cancel();
+    this.loadingCounter++;
+    this.setLoadingState();
+    this.setState(prevState => ({
+      // We know that notifications is always defined here, because we can only call this method once it got defined
+      notifications: prevState.notifications!.filter(n => n.id !== notification.id),
+    }));
+    await this.context.markNotificationAsRead(notification.id);
+    if (unsubscribe) {
+      await this.context.unsubscribeNotification(notification);
+    }
+    this.loadingCounter--;
+    this.setLoadingState();
+    this.debouncedLoadNotifications();
+  };
+
+  private loadNotifications = async () => {
+    if (this.loadingCounter > 0 || this.notificationsRequestAbort) {
+      // If there is already a checking request running, don't try to load notifications
+      return;
+    }
+
+    this.notificationsRequestAbort = new AbortController();
+    this.setLoadingState();
+    return this.context.getUnreadNotifications(this.props.repos, { signal: this.notificationsRequestAbort.signal })
       .then(nots => {;
         // TODO: This should be extracted to a better place
-        if (isWebNotificationsActive) {
+        if (getSetting('notifications_active')) {
           const newNotifications: NotificationType[] = [];
           for (const n of nots) {
-            if (lastWebNotificationShown.isAfter(n.updated_at)) {
+            if (this.state.lastWebNotificationShown.isAfter(n.updated_at)) {
               // Since notifications are sorted by updated date, we're breaking this loop
               // as soon as we found the first "old" notifications
               break;
@@ -64,106 +97,104 @@ export function NotificationList(props: NotificationListProps) {
               this.close();
             };
           }
-          setLastWebNotificationShown(moment());
+          this.setState({
+            lastWebNotificationShown: moment(),
+          });
         }
-        props.onNotificationsChange(nots);
-        setNotifications(nots);
-        setLoaded(true);
+        this.props.onNotificationsChange(nots);
+        this.setState({
+          notifications: nots,
+        });
       }).finally(() => {
-        setAbortController(null)
-        decreaseLoadingCounter();
+        this.notificationsRequestAbort = undefined;
+        this.setLoadingState();
       });
-  };
+  }
 
-  const checkNotification = async (notification: NotificationType, unsubscribe: boolean = false) => {
-    abortRunningNotificationRequest();
-    increaseLoadingCounter();
-    setNotifications(notifications.filter(n => n.id !== notification.id));
-    await github.markNotificationAsRead(notification.id);
-    if (unsubscribe) {
-      await github.unsubscribeNotification(notification);
-    }
-    decreaseLoadingCounter();
-    await loadNots();
-  };
+  private debouncedLoadNotifications = debounce(this.loadNotifications, 1000);
 
-  useEffect(() => {
-    loadNots();
-    // TODO: somehow we need to "cancel" this request when navigating away
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    focusChild(focused);
-  });
-
-  useEffect(() => {
-    const intervalId = setInterval(loadNots, 60000);
-    return () => {
-      clearInterval(intervalId);
-    };
-  });
-
-  const focusChild = (index: number) => {
-    if (index >= 0 && index < itemRefs.length) {
-      const toFocus = itemRefs[index].current;
-      if (toFocus) {
-        toFocus.focus();
-      }
-    }
-  };
-
-  const onKeyDown = (event: React.KeyboardEvent) => {
-    // eslint-disable-next-line default-case
+  private onKeyDown = (event: React.KeyboardEvent) => {
     switch (event.key) {
       case 'Down': // IE/Edge Workaround
       case 'ArrowDown':
       case 'j':
         event.preventDefault();
         event.stopPropagation();
-        focusChild(focused + 1);
+        this.focusChild(this.state.focusedItem + 1);
         break;
       case 'Up': // IE/Edge workaround
       case 'ArrowUp':
       case 'k':
         event.preventDefault();
         event.stopPropagation();
-        focusChild(focused - 1);
+        this.focusChild(this.state.focusedItem - 1);
         break;
       case 'r':
-        loadNots();
+        this.loadNotifications();
         break;
     }
   };
 
-  const visibleNotifications = notifications.filter(notification =>
-    ['Issue', 'PullRequest'].includes(notification.subject.type)
-  );
+  private focusChild(index: number) {
+    if (index >= 0 && index < this.itemRefs.length) {
+      const toFocus = this.itemRefs[index].current;
+      if (toFocus) {
+        toFocus.focus();
+      }
+    }
+  };
 
-  return (
-    <div tabIndex={0} onKeyDown={onKeyDown}>
-      {loadingCounter > 0 && (
-        <EuiPortal>
-          <EuiProgress size="xs" color="accent" position="fixed" />
-        </EuiPortal>
-      )}
-      {hasLoaded && visibleNotifications.length === 0 && (
-        <EuiEmptyPrompt
-          iconType="faceHappy"
-          title={<h2>You have no unread notifications</h2>}
-          body={<p>Enjoy your day!</p>}
-        />
-      )}
-      {visibleNotifications.map((notification, index) => (
-        <NotificationItem
-          key={notification.id}
-          ref={itemRefs[index]}
-          notification={notification}
-          initialOpen={false}
-          onFocus={() => setFocused(index)}
-          onCheck={() => checkNotification(notification)}
-          onMute={() => checkNotification(notification, true)}
-        />
-      ))}
-    </div>
-  );
+  componentDidMount() {
+    this.intervalRefreshId = window.setInterval(this.loadNotifications, 60000);
+    this.loadNotifications();
+  }
+
+  componentWillUnmount() {
+    window.clearInterval(this.intervalRefreshId);
+  }
+
+  componentDidUpdate() {
+    this.focusChild(this.state.focusedItem);
+  }
+
+  render() {
+    const { notifications, isLoading } = this.state;
+    if (!notifications) {
+      return <EuiLoadingSpinner size="m" />;
+    }
+    this.itemRefs = [];
+    for (let i = 0; i < notifications.length; i++) {
+      this.itemRefs.push(React.createRef());
+    }
+    const visibleNotifications = notifications.filter(notification =>
+      ['Issue', 'PullRequest'].includes(notification.subject.type)
+    );
+    return (
+      <div tabIndex={0} onKeyDown={this.onKeyDown}>
+        {isLoading && (
+          <EuiPortal>
+            <EuiProgress size="xs" color="accent" position="fixed" />
+          </EuiPortal>
+        )}
+        {visibleNotifications.length === 0 && (
+          <EuiEmptyPrompt
+            iconType="faceHappy"
+            title={<h2>You have no unread notifications</h2>}
+            body={<p>Enjoy your day!</p>}
+          />
+        )}
+        {visibleNotifications.map((notification, index) => (
+          <NotificationItem
+            key={notification.id}
+            ref={this.itemRefs[index]}
+            notification={notification}
+            initialOpen={false}
+            onFocus={() => this.setState({ focusedItem: index })}
+            onCheck={() => this.checkNotification(notification)}
+            onMute={() => this.checkNotification(notification, true)}
+          />
+        ))}
+      </div>
+    );
+  }
 }

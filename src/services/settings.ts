@@ -19,6 +19,10 @@ let storedSettings: Partial<Settings> = JSON.parse(localStorage.getItem(CONFIG_K
 
 const settingsSubject = new BehaviorSubject<Settings>({ ...settingDefaults, ...storedSettings });
 
+function getSetting<T extends keyof Settings>(key: T): Settings[T] {
+  return settingsSubject.getValue()[key];
+}
+
 function useSetting<T extends keyof Settings>(key: T): [Settings[T], (value: Settings[T]) => void] {
   const [setting, setSettingState] = useState(settingsSubject.getValue()[key]);
 
@@ -50,4 +54,4 @@ window.addEventListener('storage', () => {
   settingsSubject.next({ ...settingDefaults, ...storedSettings });
 });
 
-export { useSetting };
+export { useSetting, getSetting };
