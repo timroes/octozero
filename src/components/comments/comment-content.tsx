@@ -6,7 +6,10 @@ import React from 'react';
 
 import css from './comment.module.scss';
 
-const markdown = new MarkdownIt();
+const markdown = new MarkdownIt({
+  html: true,
+  linkify: true,
+});
 markdown.use(markdownEmoji);
 
 interface CommentContentProps {
