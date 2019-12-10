@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { EuiFormRow, EuiSwitch } from '@elastic/eui';
+import { EuiFormRow, EuiSwitch, EuiSwitchEvent } from '@elastic/eui';
 import { useSetting } from '../../services/settings';
 
 import css from './settings.module.scss';
@@ -9,7 +9,7 @@ export function NotificationSettings() {
   const [permissionError, setPermissionError] = useState(false);
   const [isActive, setIsActive] = useSetting('notifications_active');
 
-  const onNotificationActiveChange = async (ev: React.ChangeEvent<HTMLInputElement>) => {
+  const onNotificationActiveChange = async (ev: EuiSwitchEvent) => {
     const isActivated = ev.target.checked;
     if (!isActivated) {
       // User tries to disable notifications (we can always do that)
